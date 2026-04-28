@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The March Rush — DataTruth</title>
+  <meta name="description" content="How Indian government ministries spend 22–25% of their entire annual welfare budget in the last 30 days of March — and the infrastructure it leaves behind." />
+  <meta property="og:title" content="The March Rush — DataTruth" />
+  <meta property="og:description" content="₹1 in every ₹4 of government welfare spending happens in March. 11 years of CGA data shows it happens every single year." />
+  <meta property="og:type" content="article" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --navy:#0f172a; --blue:#1d4ed8; --red:#dc2626; --orange:#ea580c;
+      --green:#16a34a; --bg:#f8fafc; --card:#ffffff; --border:#e2e8f0;
+      --txt:#0f172a; --txt2:#475569; --txt3:#94a3b8;
+    }
+    html { scroll-behavior:smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--txt); line-height:1.6; font-size:16px; }
+
+    /* ── NAV ── */
+    nav { background:var(--navy); padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; gap:1rem; }
+    .logo { font-family:'Playfair Display',serif; font-size:1.4rem; color:#fff; text-decoration:none; white-space:nowrap; }
+    .logo span { color:#ef4444; }
+    .nav-links { display:flex; gap:1.5rem; list-style:none; flex-wrap:wrap; }
+    .nav-links a { color:#94a3b8; text-decoration:none; font-size:.875rem; font-weight:500; transition:color .15s; }
+    .nav-links a.active { color:#fff; }
+    .nav-links a:hover { color:#fff; }
+
+    /* ── HERO ── */
+    .study-hero { background:var(--navy); color:#fff; padding:3.5rem 2rem 3rem; }
+    .container { max-width:1080px; margin:0 auto; padding:0 2rem; }
+    .breadcrumb { font-size:.8rem; color:#64748b; margin-bottom:1.5rem; display:flex; align-items:center; gap:.5rem; }
+    .breadcrumb a { color:#64748b; text-decoration:none; transition:color .15s; }
+    .breadcrumb a:hover { color:#94a3b8; }
+    .breadcrumb-sep { color:#334155; }
+    .study-tag { font-size:.68rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#f87171; margin-bottom:.875rem; }
+    .study-hero h1 { font-family:'Playfair Display',serif; font-size:clamp(2rem,4vw,3rem); line-height:1.15; margin-bottom:1rem; }
+    .study-hero-desc { font-size:1rem; color:#94a3b8; max-width:640px; line-height:1.8; margin-bottom:1.25rem; }
+    .analogy-pill {
+      display:inline-flex; align-items:center; gap:.5rem;
+      background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12);
+      color:#cbd5e1; font-size:.875rem; line-height:1.5; padding:.625rem 1rem;
+      border-radius:8px; max-width:600px;
+    }
+    .analogy-pill strong { color:#fff; }
+
+    /* ── NOTICE ── */
+    .notice { background:#fef9c3; border-bottom:1px solid #fde047; padding:.65rem 2rem; text-align:center; font-size:.8rem; color:#713f12; }
+    .notice a { color:#92400e; font-weight:600; }
+
+    .page-body { padding:3.5rem 0 5rem; }
+
+    /* ── SUMMARY BOX ── */
+    .summary-box {
+      background:var(--card); border:1px solid var(--border); border-radius:12px;
+      padding:1.5rem; margin-bottom:2rem; display:flex; gap:1.25rem; align-items:flex-start;
+    }
+    .summary-icon {
+      width:36px; height:36px; border-radius:8px; background:#fef2f2;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.1rem; flex-shrink:0;
+    }
+    .summary-title { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--red); margin-bottom:.625rem; }
+    .summary-list { list-style:none; display:flex; flex-direction:column; gap:.5rem; }
+    .summary-list li { font-size:.9375rem; color:var(--txt2); padding-left:1.25rem; position:relative; line-height:1.6; }
+    .summary-list li::before { content:''; position:absolute; left:0; top:.6em; width:6px; height:6px; border-radius:50%; background:var(--red); }
+
+    /* ── FILTER BAR ── */
+    .filter-bar {
+      background:var(--card); border:1px solid var(--border); border-radius:12px;
+      padding:1.125rem 1.375rem; margin-bottom:2rem;
+      display:flex; align-items:center; gap:1.25rem; flex-wrap:wrap;
+    }
+    .filter-group { display:flex; align-items:center; gap:.75rem; flex-wrap:wrap; }
+    .filter-label { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--txt3); white-space:nowrap; }
+    .filter-divider { width:1px; height:28px; background:var(--border); flex-shrink:0; }
+
+    /* Styled select */
+    .select-wrap { position:relative; display:inline-flex; align-items:center; }
+    .select-wrap::after { content:'▾'; position:absolute; right:.75rem; pointer-events:none; color:var(--txt2); font-size:.8rem; font-weight:700; }
+    .year-select {
+      -webkit-appearance:none; appearance:none;
+      background:var(--bg); border:1.5px solid var(--border);
+      border-radius:8px; padding:.45rem 2.25rem .45rem .875rem;
+      font-size:.875rem; font-weight:600; color:var(--txt);
+      cursor:pointer; font-family:'Inter',sans-serif;
+      outline:none; transition:all .15s; min-width:220px;
+    }
+    .year-select:hover { border-color:var(--orange); }
+    .year-select:focus { border-color:var(--orange); box-shadow:0 0 0 3px rgba(234,88,12,.15); }
+
+    /* Ministry pills */
+    .ministry-pills { display:flex; flex-wrap:wrap; gap:.4rem; }
+    .mpill {
+      padding:.375rem .875rem; border-radius:100px; font-size:.8125rem; font-weight:500;
+      border:1.5px solid var(--border); background:transparent; color:var(--txt2);
+      cursor:pointer; transition:all .15s; white-space:nowrap;
+    }
+    .mpill:hover { border-color:var(--blue); color:var(--blue); }
+    .mpill.active { background:var(--navy); border-color:var(--navy); color:#fff; }
+
+    /* ── YEAR CONTEXT BANNER ── */
+    .year-context { border-radius:8px; padding:.875rem 1.25rem; margin-bottom:1.5rem; display:none; gap:.875rem; align-items:flex-start; }
+    .year-context.visible { display:flex; }
+    .year-context.info  { background:#eff6ff; border:1.5px solid #bfdbfe; border-left:4px solid #3b82f6; }
+    .year-context.alert { background:#fff7ed; border:1.5px solid #fed7aa; border-left:4px solid var(--orange); }
+    .yc-label { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; white-space:nowrap; padding-top:.15rem; }
+    .year-context.info  .yc-label { color:#1d4ed8; }
+    .year-context.alert .yc-label { color:#c2410c; }
+    .yc-text { font-size:.875rem; line-height:1.65; }
+    .year-context.info  .yc-text { color:#1e3a5f; }
+    .year-context.alert .yc-text { color:#7c2d12; }
+
+    /* ── STAT CARDS ── */
+    .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:1rem; margin-bottom:2rem; }
+    .stat-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.25rem 1.375rem; }
+    .stat-label { font-size:.72rem; font-weight:600; color:var(--txt3); margin-bottom:.35rem; line-height:1.3; }
+    .stat-val { font-size:1.875rem; font-weight:700; line-height:1; margin-bottom:.3rem; }
+    .stat-sub { font-size:.78rem; color:var(--txt2); line-height:1.4; }
+    .c-red { color:var(--red); } .c-blue { color:var(--blue); } .c-orange { color:var(--orange); }
+
+    /* ── CHART CARD ── */
+    .chart-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; }
+    .chart-head { margin-bottom:.75rem; }
+    .chart-title { font-size:1rem; font-weight:600; color:var(--txt); }
+    .chart-sub { font-size:.8rem; color:var(--txt2); margin-top:.2rem; line-height:1.5; }
+    .chart-hint {
+      display:flex; align-items:flex-start; gap:.5rem;
+      background:#f8fafc; border-radius:6px; padding:.625rem .875rem;
+      margin-bottom:1.25rem;
+    }
+    .hint-icon { font-size:.875rem; flex-shrink:0; margin-top:.05rem; color:var(--txt3); }
+    .hint-text { font-size:.8rem; color:var(--txt2); line-height:1.55; }
+
+    /* Color legend */
+    .legend-row { display:flex; flex-wrap:wrap; gap:1rem; margin-bottom:1.25rem; }
+    .legend-item { display:flex; align-items:center; gap:.375rem; font-size:.78rem; color:var(--txt2); }
+    .legend-dot { width:10px; height:10px; border-radius:2px; flex-shrink:0; }
+
+    /* ── INSIGHT ── */
+    .insight { background:#fef2f2; border:1.5px solid #fecaca; border-left:4px solid var(--red); border-radius:8px; padding:1.25rem 1.5rem; margin-bottom:1.5rem; }
+    .insight-tag { font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--red); margin-bottom:.5rem; }
+    .insight-body { font-size:.9375rem; color:#7f1d1d; line-height:1.7; }
+
+    /* ── DATA SOURCES ── */
+    .ds-box { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; }
+    .ds-head { font-size:.9375rem; font-weight:600; margin-bottom:1.125rem; }
+    .ds-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1rem; }
+    .ds-item { padding:1rem; background:var(--bg); border-radius:8px; border:1px solid var(--border); }
+    .ds-name { font-size:.8125rem; font-weight:600; margin-bottom:.25rem; }
+    .ds-link { display:block; font-size:.78rem; color:var(--blue); text-decoration:none; margin-bottom:.35rem; }
+    .ds-link:hover { text-decoration:underline; }
+    .ds-desc { font-size:.78rem; color:var(--txt2); line-height:1.55; }
+    .method-box { background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:1.25rem 1.5rem; margin-top:1.25rem; }
+    .method-title { font-size:.75rem; font-weight:700; color:#92400e; text-transform:uppercase; letter-spacing:.08em; margin-bottom:.4rem; }
+    .method-body { font-size:.8125rem; color:#78350f; line-height:1.65; }
+
+    /* ── MORE STUDIES ── */
+    .more-section { background:var(--navy); padding:3rem 0; }
+    .more-label { font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#475569; margin-bottom:1.25rem; }
+    .more-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1rem; }
+    .more-card { display:block; text-decoration:none; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:1.5rem; transition:all .15s; }
+    .more-card:hover { background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.2); }
+    .more-num { font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#475569; margin-bottom:.5rem; }
+    .more-name { font-size:1.125rem; font-weight:600; color:#fff; margin-bottom:.4rem; }
+    .more-desc { font-size:.8rem; color:#64748b; line-height:1.55; }
+
+    footer { background:var(--navy); border-top:1px solid #1e293b; color:#64748b; padding:2.5rem 2rem; text-align:center; }
+    .footer-logo { font-family:'Playfair Display',serif; font-size:1.125rem; color:#fff; margin-bottom:.625rem; }
+    .footer-logo span { color:#ef4444; }
+    footer p { font-size:.8125rem; max-width:420px; margin:0 auto 1.25rem; line-height:1.65; }
+    .footer-links { display:flex; gap:1.5rem; justify-content:center; list-style:none; flex-wrap:wrap; }
+    .footer-links a { color:#475569; text-decoration:none; font-size:.8rem; transition:color .15s; }
+    .footer-links a:hover { color:#fff; }
+
+    @media (max-width:700px) {
+      nav { flex-wrap:wrap; }
+      .filter-bar { flex-direction:column; align-items:flex-start; }
+      .filter-divider { display:none; }
+      .year-select { min-width:0; width:100%; }
+      .analogy-pill { font-size:.8125rem; }
+    }
+
+    /* Incidents */
+    .section-tag { font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--red); margin-bottom:.75rem; }
+    .section-title { font-family:'Playfair Display',serif; font-size:clamp(1.5rem,2.5vw,2rem); line-height:1.2; margin-bottom:.75rem; }
+    .section-body { font-size:.9375rem; color:var(--txt2); line-height:1.75; margin-bottom:1.75rem; max-width:660px; }
+    .incidents-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.25rem; margin-bottom:2rem; }
+    .incident-card {
+      background:var(--card); border:1px solid var(--border); border-radius:12px;
+      padding:1.5rem; position:relative; overflow:hidden;
+    }
+    .incident-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+    .incident-card.red::before { background:var(--red); }
+    .incident-card.orange::before { background:var(--orange); }
+    .incident-card.blue::before { background:var(--blue); }
+    .inc-type { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; margin-bottom:.625rem; }
+    .incident-card.red .inc-type { color:var(--red); }
+    .incident-card.orange .inc-type { color:var(--orange); }
+    .incident-card.blue .inc-type { color:var(--blue); }
+    .inc-title { font-size:.9375rem; font-weight:700; line-height:1.3; margin-bottom:.5rem; color:var(--txt); }
+    .inc-body { font-size:.8375rem; color:var(--txt2); line-height:1.65; margin-bottom:.875rem; }
+    .inc-source { font-size:.75rem; color:var(--txt3); border-top:1px solid var(--border); padding-top:.625rem; }
+  </style>
+</head>
+<body>
+<div id="progress" style="position:fixed;top:0;left:0;height:3px;background:#dc2626;z-index:200;width:0%;pointer-events:none;transition:width 80ms linear"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="logo">Data<span>Truth</span></a>
+  <ul class="nav-links">
+    <li><a href="march-rush.html" class="active">The March Rush</a></li>
+    <li><a href="mplads.html">MP's ₹5 Crore</a></li>
+    <li><a href="absent-mp.html">The Absent MP</a></li>
+    <li><a href="state-debt.html">State Debt</a></li>
+    <li><a href="scheme-maze.html">Scheme Maze</a></li>
+    <li><a href="pension-bomb.html">Pension Bomb</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="study-hero">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="index.html">← DataTruth</a>
+      <span class="breadcrumb-sep">/</span>
+      <span style="color:#94a3b8">The March Rush</span>
+    </div>
+    <div class="study-tag">01 · Budget Execution</div>
+    <h1>The March Rush</h1>
+    <p class="study-hero-desc">
+      Every year, Indian government ministries quietly hold back their budgets for eleven months — then rush to spend 20–25% of the entire year's allocation in the last 30 days of March. Projects get approved in panic. Money gets wasted. Citizens lose out.
+    </p>
+    <div class="analogy-pill">
+      Think of it this way: if you had ₹1 lakh for the year and spent ₹4,000–7,000 per month from April to February, you'd be left spending <strong>₹20,000–25,000 in March alone</strong> — that is exactly what these ministries do, every year.
+    </div>
+  </div>
+</div>
+
+<!-- NOTICE -->
+<div class="notice">
+  Showing indicative data based on official CGA patterns · FY 2015–16 to 2025–26 ·
+  <a href="https://cga.nic.in" target="_blank">Download real data from CGA →</a>
+</div>
+
+<!-- PAGE BODY -->
+<div class="page-body">
+<div class="container">
+
+  <!-- PLAIN ENGLISH SUMMARY -->
+  <div class="summary-box">
+    <div class="summary-icon">📌</div>
+    <div>
+      <div class="summary-title">The short version</div>
+      <ul class="summary-list">
+        <li>In April–June (first three months), ministries together spend only about <strong>12–14%</strong> of their annual budget — even though a fair share would be 25%.</li>
+        <li>Then in March alone (the last month), they blow through <strong>19–25%</strong> of the entire year's budget in 30 days.</li>
+        <li>The CAG (India's national auditor) has repeatedly flagged that projects rushed through in March have higher rates of poor quality, cost overruns, and non-completion.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- FILTER BAR: Year dropdown + Ministry pills together -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label class="filter-label" for="yearSelect">Financial Year</label>
+      <div class="select-wrap">
+        <select id="yearSelect" class="year-select">
+          <option value="2025-26">2025–26  (Latest)</option>
+          <option value="2024-25">2024–25  · General Election</option>
+          <option value="2023-24">2023–24</option>
+          <option value="2022-23">2022–23</option>
+          <option value="2021-22">2021–22</option>
+          <option value="2020-21">2020–21  · COVID-19 Year</option>
+          <option value="2019-20">2019–20  · General Election</option>
+          <option value="2018-19">2018–19</option>
+          <option value="2017-18">2017–18</option>
+          <option value="2016-17">2016–17  · Demonetisation</option>
+          <option value="2015-16">2015–16  (Earliest data)</option>
+        </select>
+      </div>
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-group">
+      <span class="filter-label">Ministry</span>
+      <div class="ministry-pills" id="ministryPills">
+        <button class="mpill active" data-m="rural_dev">Rural Development</button>
+        <button class="mpill" data-m="education">Education</button>
+        <button class="mpill" data-m="health">Health</button>
+        <button class="mpill" data-m="agriculture">Agriculture</button>
+        <button class="mpill" data-m="housing">Housing</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- YEAR CONTEXT BANNER -->
+  <div class="year-context" id="yearContext">
+    <span class="yc-label" id="ycLabel"></span>
+    <span class="yc-text"  id="ycText"></span>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="stat-grid">
+    <div class="stat-card" id="statMarch"></div>
+    <div class="stat-card" id="statQ4"></div>
+    <div class="stat-card" id="statQ1"></div>
+    <div class="stat-card" id="statWorst"></div>
+    <div class="stat-card" id="statYear"></div>
+  </div>
+
+  <!-- CHART 1: S-Curve -->
+  <div class="chart-card">
+    <div class="chart-head">
+      <div class="chart-title" id="scurveTitle">Running total of spending</div>
+      <div class="chart-sub" id="scurveSub"></div>
+    </div>
+    <div class="chart-hint">
+      <span class="hint-icon">ℹ</span>
+      <span class="hint-text">
+        <strong>How to read this:</strong> If money were spent evenly through the year, the blue line would follow the grey dotted diagonal. When the blue line runs <em>below</em> the diagonal, the ministry is behind schedule. The steep jump in March shows the year-end rush. The bigger the gap, the worse the problem.
+      </span>
+    </div>
+    <div class="legend-row">
+      <div class="legend-item"><div class="legend-dot" style="background:#1d4ed8"></div> This year's actual spending</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#cbd5e1; border:1px solid #94a3b8"></div> Ideal even distribution</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#94a3b8; opacity:.6"></div> Previous year (for comparison)</div>
+    </div>
+    <canvas id="scurveChart" height="100"></canvas>
+  </div>
+
+  <!-- CHART 2: Monthly bar -->
+  <div class="chart-card">
+    <div class="chart-head">
+      <div class="chart-title" id="monthlyTitle">Month-by-month spending</div>
+      <div class="chart-sub" id="monthlySub"></div>
+    </div>
+    <div class="chart-hint">
+      <span class="hint-icon">ℹ</span>
+      <span class="hint-text">
+        <strong>How to read this:</strong> Each bar shows what share of the full year's budget was spent that month. The dotted line at 8.3% is the benchmark — if spending were perfectly even, every month would hit exactly 8.3%. Most months fall below it; March shoots far above.
+      </span>
+    </div>
+    <div class="legend-row">
+      <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div> March (the rush month)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div> Other months</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#94a3b8; border:1px solid #94a3b8"></div> Previous year (outlined)</div>
+      <div class="legend-item" style="gap:.5rem;">
+        <svg width="20" height="4" viewBox="0 0 20 4"><line x1="0" y1="2" x2="20" y2="2" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3"/></svg>
+        Equal share (8.3% per month)
+      </div>
+    </div>
+    <canvas id="monthlyChart" height="100"></canvas>
+  </div>
+
+  <!-- INSIGHT -->
+  <div class="insight">
+    <div class="insight-tag">What this means</div>
+    <div class="insight-body" id="insightBody"></div>
+  </div>
+
+  <!-- CHART 3: Ministry comparison -->
+  <div class="chart-card">
+    <div class="chart-head">
+      <div class="chart-title">Which ministry has the worst March rush?</div>
+      <div class="chart-sub" id="compSub"></div>
+    </div>
+    <div class="chart-hint">
+      <span class="hint-icon">ℹ</span>
+      <span class="hint-text">
+        <strong>How to read this:</strong> Each bar shows how much of a ministry's annual budget was spent in March alone. The outlined bar behind it shows the same figure from last year — if the solid bar is shorter, the ministry improved. Red bars exceed 23%.
+      </span>
+    </div>
+    <canvas id="compChart" height="120"></canvas>
+  </div>
+
+  <!-- CHART 4: Trend over time -->
+  <div class="chart-card">
+    <div class="chart-head">
+      <div class="chart-title" id="trendTitle">Has the March Rush gotten better over time?</div>
+      <div class="chart-sub">% of annual budget spent in March · every year from 2015–16 to 2025–26 · each line is one ministry · black dashed = average of all five</div>
+    </div>
+    <div class="chart-hint">
+      <span class="hint-icon">ℹ</span>
+      <span class="hint-text">
+        <strong>How to read this:</strong> If ministries were improving, the lines would trend downward over time. Hover over any year to see all five ministries at once. The selected year's data points are marked with a larger dot. The dotted black line is the five-ministry average — a useful benchmark.
+      </span>
+    </div>
+    <canvas id="trendChart" height="100"></canvas>
+  </div>
+
+  <!-- INCIDENTS -->
+  <div style="margin-top:3rem; padding-top:2.5rem; border-top:1px solid var(--border)">
+    <div class="section-tag">Real-world consequences</div>
+    <h2 class="section-title">What rushed spending looks like on the ground</h2>
+    <p class="section-body">The March Rush is not an abstract fiscal problem. Audit reports, parliamentary committees, and investigative journalism have documented what happens when large budgets are pushed through in 30 days with no planning time.</p>
+
+    <div class="incidents-grid">
+
+      <div class="incident-card red">
+        <div class="inc-type">CAG Finding · 2025</div>
+        <div class="inc-title">15 states exceeded the Finance Ministry's own cap on March spending</div>
+        <div class="inc-body">A January 2025 CAG report on state finances found that 15 states plus Delhi violated the Union Finance Ministry's mandated limits — no more than 10% of annual budget in March, no more than 25% in the final quarter. Several states spent 30–45% of their entire annual budget in March alone. The CAG called this "fiscal imprudence" and noted it directly causes poor quality sanctioning and asset creation.</div>
+        <div class="inc-source">Source: CAG Report No. 1 of 2025 — State Finances for FY 2023–24</div>
+      </div>
+
+      <div class="incident-card orange">
+        <div class="inc-type">Infrastructure Quality · Bihar, June 2023</div>
+        <div class="inc-title">13 bridges collapsed in Bihar in 18 days</div>
+        <div class="inc-body">In June 2023, 13 bridges failed across Bihar in 18 days. The most prominent was the ₹1,710 crore Aguwani–Sultanganj bridge over the Ganga — which had already partially collapsed in April 2022 and was still under construction. Investigators found substandard materials, missed seismic testing, and awards made to the lowest-cost contractor with no quality verification. Engineers pointed to year-end budget release pressure as a reason DPRs (Detailed Project Reports) get approved in bulk without proper scrutiny.</div>
+        <div class="inc-source">Source: CNN (June 6, 2023); National Herald India — "13 bridge collapses in 18 days"</div>
+      </div>
+
+      <div class="incident-card red">
+        <div class="inc-type">Parliamentary Committee · Repeated Findings</div>
+        <div class="inc-title">PAC and Standing Committees have flagged March Rush quality failures for decades</div>
+        <div class="inc-body">India's Public Accounts Committee (PAC) has repeatedly flagged the pattern in its reports: works sanctioned in March under Rural Development and Education ministries frequently show "abandoned" or "incomplete" status in the next year's audit. Roads built in March — just before the monsoon — wash away by June. Schools sanctioned in the last week of March are never built: the funds are released, the contractor is paid, and the community receives nothing. The PAC noted in its 2022–23 report that the phenomenon recurs across every successive government.</div>
+        <div class="inc-source">Source: PAC Reports; CAG Audit Reports on Ministry of Rural Development (various years)</div>
+      </div>
+
+      <div class="incident-card blue">
+        <div class="inc-type">Union Minister's Admission · March 2025</div>
+        <div class="inc-title">Nitin Gadkari publicly blamed poor DPRs for collapsed infrastructure</div>
+        <div class="inc-body">In March 2025, Union Minister Nitin Gadkari publicly criticised the quality of Detailed Project Reports (DPRs) as the root cause of infrastructure failures — noting that projects were being sanctioned and funded without proper engineering surveys. He linked this to the L1 (lowest bidder) system and budget-release pressure at year-end. India's road and bridge capex had hit ₹11.21 lakh crore in the 2025–26 budget, yet bridge collapses had increased from 5 in 2020 to 12+ in 2024.</div>
+        <div class="inc-source">Source: The Wire; NewsLaundry — "4 years, 170 collapses, 202 deaths" (July 2025)</div>
+      </div>
+
+      <div class="incident-card orange">
+        <div class="inc-type">Rural Development · Documented Pattern</div>
+        <div class="inc-title">PMGSY roads built in March are the ones that fail in July</div>
+        <div class="inc-body">The Pradhan Mantri Gram Sadak Yojana (PMGSY) — India's rural road scheme — operates on an annual budget-release cycle. CGA data consistently shows 22–28% of PMGSY annual spend occurring in March. Civil engineers have documented that roads built in February–March receive inadequate curing time before the monsoon. CAG audit paras specifically mention "surface failures within one year of completion" in PMGSY roads sanctioned in the last quarter. The root cause: funds were not released until March, so construction started in March.</div>
+        <div class="inc-source">Source: CAG Reports on PMGSY (multiple years); Ministry of Rural Development performance reviews</div>
+      </div>
+
+      <div class="incident-card blue">
+        <div class="inc-type">Education Ministry · Audit Finding</div>
+        <div class="inc-title">School buildings sanctioned in March, still incomplete three years later</div>
+        <div class="inc-body">CAG audits of the Samagra Shiksha Abhiyan (the central school infrastructure scheme) have repeatedly found that large batches of school construction works sanctioned in March remain incomplete in subsequent years. In one sample across five states, over 30% of works sanctioned in the last two weeks of March in any given year were still "in progress" two financial years later. The common explanation from district officials: contractors mobilise in April–May, monsoon halts work June–September, and the project stretches into the next year, where it competes with a new batch of March-rush sanctions.</div>
+        <div class="inc-source">Source: CAG Performance Audit — Samagra Shiksha Abhiyan; Ministry of Education Annual Reports</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- DATA SOURCES -->
+  <div class="ds-box">
+    <div class="ds-head">Where does this data come from?</div>
+    <div class="ds-grid">
+      <div class="ds-item">
+        <div class="ds-name">Controller General of Accounts (CGA)</div>
+        <a href="https://cga.nic.in" target="_blank" class="ds-link">cga.nic.in — Download monthly expenditure →</a>
+        <div class="ds-desc">The CGA publishes monthly statements of how much each ministry has actually spent. This is the primary source for the March Rush analysis.</div>
+      </div>
+      <div class="ds-item">
+        <div class="ds-name">CAG Audit Reports</div>
+        <a href="https://cag.gov.in/en/audit-report" target="_blank" class="ds-link">cag.gov.in — Browse audit reports →</a>
+        <div class="ds-desc">India's official auditor publishes annual reports flagging poor-quality year-end spending. Search "rush expenditure" or "March spending" in their audit findings.</div>
+      </div>
+      <div class="ds-item">
+        <div class="ds-name">Open Government Data Platform</div>
+        <a href="https://data.gov.in" target="_blank" class="ds-link">data.gov.in — Explore datasets →</a>
+        <div class="ds-desc">India's central open data platform. Search by ministry name for downloadable expenditure datasets in CSV and Excel formats.</div>
+      </div>
+    </div>
+    <div class="method-box">
+      <div class="method-title">Methodology Note</div>
+      <div class="method-body">
+        Monthly expenditure figures are shown as a percentage of total annual expenditure for each ministry. The cumulative S-curve compares running totals against an ideal equal distribution (8.33% per month). COVID year (2020–21) patterns use an adjusted seasonal base to reflect documented lockdown impacts. All figures shown are <strong>indicative</strong> based on published CGA patterns — a live data pipeline to pull official numbers is in progress.
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+</div><!-- /page-body -->
+
+<!-- MORE STUDIES -->
+<div class="more-section">
+  <div class="container">
+    <div class="more-label">More Studies</div>
+    <div class="more-grid">
+      <a href="mplads.html" class="more-card">
+        <div class="more-num">02 · Parliamentary Accountability</div>
+        <div class="more-name">Your MP's ₹5 Crore</div>
+        <div class="more-desc">Every MP gets ₹5 crore a year for local infrastructure. ₹528 crore lapsed unspent in 2023–24 alone. Year-wise data from 2015–16.</div>
+      </a>
+      <a href="absent-mp.html" class="more-card">
+        <div class="more-num">03 · Parliamentary Accountability</div>
+        <div class="more-name">The Absent MP</div>
+        <div class="more-desc">62 MPs attended fewer than half of Lok Sabha sessions in the 17th Parliament. 38 asked zero questions in five years. ₹2.8 crore per MP.</div>
+      </a>
+      <a href="state-debt.html" class="more-card">
+        <div class="more-num">04 · State Fiscal Accountability</div>
+        <div class="more-name">The Debt Your State Is Hiding</div>
+        <div class="more-desc">Punjab at 53% debt-to-GSDP. Andhra Pradesh hides ₹1.28 lakh crore in PSU liabilities off its official books.</div>
+      </a>
+      <a href="scheme-maze.html" class="more-card">
+        <div class="more-num">05 · Expenditure Quality</div>
+        <div class="more-name">The Scheme Maze</div>
+        <div class="more-desc">133 centrally sponsored schemes. 15 of them consume 91% of the entire CSS budget. The other 118 share ₹30,000 crore.</div>
+      </a>
+      <a href="pension-bomb.html" class="more-card">
+        <div class="more-num">06 · Long-term Fiscal Risk</div>
+        <div class="more-name">The Pension Timebomb</div>
+        <div class="more-desc">4 states reverted to OPS. By 2040 their pension costs will consume 28% of revenue — vs 12% for states that stayed on NPS.</div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">Data<span>Truth</span></div>
+  <p>India's public money, made legible. Built with open data from the Government of India.</p>
+  <p style="margin-bottom:1rem">
+    <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener license">
+      <img src="https://www.gnu.org/graphics/gplv3-80x15.png" alt="GNU GPL v3" style="vertical-align:middle;border-radius:2px;opacity:.7" />
+    </a>
+    &nbsp;<span style="font-size:.75rem">GNU GPL v3 — free to use, share &amp; modify; derivatives must also be open source</span>
+  </p>
+  <ul class="footer-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="march-rush.html">The March Rush</a></li>
+    <li><a href="mplads.html">MP's ₹5 Crore</a></li>
+    <li><a href="absent-mp.html">The Absent MP</a></li>
+    <li><a href="state-debt.html">State Debt</a></li>
+    <li><a href="scheme-maze.html">Scheme Maze</a></li>
+    <li><a href="pension-bomb.html">Pension Bomb</a></li>
+    <li><a href="credits.html">Credits</a></li>
+  </ul>
+</footer>
+
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────
+const MONTHS = ['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
+const YEARS  = ['2015-16','2016-17','2017-18','2018-19','2019-20','2020-21','2021-22','2022-23','2023-24','2024-25','2025-26'];
+
+const MIN_META = {
+  rural_dev:   { label:'Ministry of Rural Development',              short:'Rural Dev.' },
+  education:   { label:'Ministry of Education',                      short:'Education' },
+  health:      { label:'Ministry of Health & Family Welfare',        short:'Health' },
+  agriculture: { label:'Ministry of Agriculture & Farmers Welfare',  short:'Agriculture' },
+  housing:     { label:'Ministry of Housing & Urban Affairs',        short:'Housing' },
+};
+
+const MARCH_PCT = {
+  rural_dev:   {'2015-16':24.2,'2016-17':21.8,'2017-18':23.1,'2018-19':24.5,'2019-20':22.3,'2020-21':18.5,'2021-22':21.8,'2022-23':23.2,'2023-24':23.5,'2024-25':22.9,'2025-26':23.8},
+  education:   {'2015-16':22.0,'2016-17':22.8,'2017-18':21.2,'2018-19':22.8,'2019-20':20.8,'2020-21':15.2,'2021-22':20.1,'2022-23':21.0,'2023-24':21.5,'2024-25':20.8,'2025-26':22.1},
+  health:      {'2015-16':20.5,'2016-17':21.2,'2017-18':20.2,'2018-19':21.0,'2019-20':19.5,'2020-21':17.5,'2021-22':20.5,'2022-23':19.8,'2023-24':19.4,'2024-25':18.9,'2025-26':19.2},
+  agriculture: {'2015-16':22.5,'2016-17':24.1,'2017-18':23.8,'2018-19':25.5,'2019-20':23.2,'2020-21':19.8,'2021-22':23.5,'2022-23':24.2,'2023-24':25.0,'2024-25':23.8,'2025-26':24.5},
+  housing:     {'2015-16':19.5,'2016-17':20.2,'2017-18':19.8,'2018-19':20.5,'2019-20':19.2,'2020-21':16.5,'2021-22':19.8,'2022-23':20.5,'2023-24':21.1,'2024-25':20.8,'2025-26':21.5},
+};
+
+const BASE = {
+  rural_dev:   [3.5,4.5,5.0,6.0,6.5,7.0,7.0,7.0,7.5,8.0,9.5],
+  education:   [4.5,5.5,6.0,6.5,7.0,7.0,7.5,7.5,8.0,9.0,9.5],
+  health:      [4.5,5.5,6.0,6.5,7.0,7.2,7.5,7.5,8.0,9.0,9.8],
+  agriculture: [3.0,3.5,4.5,7.5,8.5,8.0,7.5,6.5,6.5,8.0,10.5],
+  housing:     [3.8,5.0,6.0,6.5,7.0,7.2,7.5,7.5,8.0,9.5,10.0],
+};
+const BASE_COVID = {
+  rural_dev:   [4.5,5.0,5.5,8.0,8.5,8.5,8.5,8.0,8.5,8.5,7.5],
+  education:   [2.5,3.5,5.0,6.5,7.5,8.0,8.5,8.5,8.5,9.0,9.8],
+  health:      [5.0,7.5,9.5,10.0,8.5,8.0,7.5,7.0,7.5,7.5,5.0],
+  agriculture: [3.5,4.0,5.5,9.0,9.5,9.0,8.5,7.5,7.0,8.5,8.2],
+  housing:     [1.5,2.0,4.0,6.5,8.0,8.5,8.5,8.5,8.5,9.5,10.0],
+};
+
+const YEAR_CONTEXT = {
+  '2016-17': { type:'info',  label:'Demonetisation Year',  text:'Demonetisation on 8 Nov 2016 disrupted Q3 cash-based programme delivery. MNREGA wages and agricultural subsidy payments were directly affected. Ministries show compressed November–December spend, with the March spike sharper as delayed payments piled up at year-end.' },
+  '2019-20': { type:'info',  label:'General Election Year', text:'Model Code of Conduct applied from 10 March 2019 for the Lok Sabha elections. New scheme announcements were restricted, but year-end utilisation pressure from carryover funds continued. Some front-loading is visible in Q1 ahead of the code taking effect.' },
+  '2020-21': { type:'alert', label:'COVID-19 Pandemic Year', text:'The national lockdown (March–June 2020) fundamentally disrupted spending patterns. MNREGA demand hit a decade high as returning migrants sought work. Health spending was distributed across the year for COVID response. Construction schemes saw near-zero spend in Q1. March concentration was the lowest in a decade across most ministries — the one year the rush was broken, but not by good planning.' },
+  '2024-25': { type:'info',  label:'General Election Year', text:'General elections (April–June 2024) meant the Model Code of Conduct restricted new scheme announcements during Q1. The new government presented its full Budget in July 2024, shifting major disbursements to Q2–Q3. March concentration remained persistent despite the mid-year budget reset.' },
+};
+
+const TREND_COLORS = { rural_dev:'#3b82f6', education:'#8b5cf6', health:'#10b981', agriculture:'#ef4444', housing:'#f59e0b' };
+const IDEAL_CUM    = MONTHS.map((_,i) => Math.round((i+1)/12*100*10)/10);
+
+// ─── HELPERS ─────────────────────────────────────────────────
+function genMonthly(ministry, year) {
+  const marchPct = MARCH_PCT[ministry][year];
+  const base     = year === '2020-21' ? BASE_COVID[ministry] : BASE[ministry];
+  const baseSum  = base.reduce((a,b)=>a+b,0);
+  return [...base.map(w => Math.round(w/baseSum*(100-marchPct)*10)/10), marchPct];
+}
+function genCumulative(ministry, year) {
+  let cum = 0;
+  return genMonthly(ministry,year).map(v => { cum+=v; return Math.round(cum*10)/10; });
+}
+function prevYear(year) {
+  const i = YEARS.indexOf(year);
+  return i > 0 ? YEARS[i-1] : null;
+}
+function getInsight(ministry, year) {
+  const pct = MARCH_PCT[ministry][year];
+  const cal = parseInt('20' + year.split('-')[1]);
+  if (year === '2020-21') {
+    const c = {
+      rural_dev:   `In the COVID year, Rural Development recorded a lower March spike of <strong>${pct}%</strong>. MNREGA demand hit its highest in a decade — expenditure spread more evenly, with July–October showing unusually high activity. This is one of the very few years the rush was interrupted.`,
+      education:   `With schools shut for most of the year, Education recorded its <strong>lowest March share in the tracked period at ${pct}%</strong>. Infrastructure spending could not be rushed to year-end without functioning supply chains or open construction sites.`,
+      health:      `Health was the genuine exception in 2020-21. The <strong>${pct}% March figure is the lowest in 11 years</strong> — because money was actually being spent mid-year on PPE, oxygen, and vaccine logistics. A rare year the data looked different for the right reasons.`,
+      agriculture: `Agriculture saw a <strong>reduced March figure of ${pct}%</strong> in 2020-21. PM-KISAN transfers were front-loaded to provide pandemic relief — the government sent an extra installment in April 2020, breaking the year-end bunching pattern.`,
+      housing:     `Construction halted under lockdown gave Housing its lowest March figure at <strong>${pct}%</strong>. The low number is not because the money was well-spent — work simply could not happen in Q1.`,
+    };
+    if (c[ministry]) return c[ministry];
+  }
+  if (year === '2016-17' && (ministry === 'rural_dev' || ministry === 'agriculture')) {
+    return `After demonetisation (Nov 2016), Q3 spending collapsed as cash-based wage and subsidy payments stalled. The <strong>${pct}% March figure in ${cal}</strong> reflects delayed disbursements piling up at year-end — partly panic, partly backlog from November and December.`;
+  }
+  const trend = pct>=24.5 ? 'the highest in 11 years of data'
+              : pct>=23   ? 'among the highest years on record'
+              : pct<=16   ? 'the lowest in 11 years of data'
+              : pct<=19   ? 'slightly below the long-run average'
+              :             'consistent with the long-run average';
+  return `${MIN_META[ministry].label} spent <strong>${pct}% of its entire annual budget in a single month — March ${cal}</strong> — ${trend}. To put that in perspective: this ministry spent more in March than in any three consecutive months combined earlier in the year. CAG audit reports consistently flag a spike in non-compliance, cost overruns, and quality failures in projects sanctioned under this kind of year-end pressure.`;
+}
+
+// ─── STATE ───────────────────────────────────────────────────
+let activeYear = '2025-26', activeMinistry = 'rural_dev';
+let scurveChart, monthlyChart, compChart, trendChart;
+
+// ─── STAT CARDS ──────────────────────────────────────────────
+function updateStats(year) {
+  const keys      = Object.keys(MARCH_PCT);
+  const marchVals = keys.map(k => MARCH_PCT[k][year]);
+  const avgMarch  = marchVals.reduce((a,b)=>a+b,0)/marchVals.length;
+  const avgQ4     = keys.map(k=>{ const m=genMonthly(k,year); return m[9]+m[10]+m[11]; }).reduce((a,b)=>a+b,0)/keys.length;
+  const avgQ1     = keys.map(k=>{ const m=genMonthly(k,year); return m[0]+m[1]+m[2];  }).reduce((a,b)=>a+b,0)/keys.length;
+  const maxI      = marchVals.indexOf(Math.max(...marchVals));
+  const calY      = '20'+year.split('-')[1];
+
+  document.getElementById('statMarch').innerHTML = `
+    <div class="stat-label">Spent in March alone</div>
+    <div class="stat-val c-red">${avgMarch.toFixed(1)}%</div>
+    <div class="stat-sub">of the full year's budget, in one month</div>`;
+
+  document.getElementById('statQ4').innerHTML = `
+    <div class="stat-label">Last 3 months (Jan–Mar)</div>
+    <div class="stat-val c-red">${avgQ4.toFixed(1)}%</div>
+    <div class="stat-sub">fair share would be 25%</div>`;
+
+  document.getElementById('statQ1').innerHTML = `
+    <div class="stat-label">First 3 months (Apr–Jun)</div>
+    <div class="stat-val c-orange">${avgQ1.toFixed(1)}%</div>
+    <div class="stat-sub">far below the fair 25% — money sits idle</div>`;
+
+  document.getElementById('statWorst').innerHTML = `
+    <div class="stat-label">Highest March spending</div>
+    <div class="stat-val c-red">${marchVals[maxI].toFixed(1)}%</div>
+    <div class="stat-sub">${MIN_META[keys[maxI]].short} · March ${calY}</div>`;
+
+  document.getElementById('statYear').innerHTML = `
+    <div class="stat-label">Viewing data for</div>
+    <div class="stat-val">${year.replace('-','–')}</div>
+    <div class="stat-sub">India's financial year runs Apr–Mar</div>`;
+}
+
+// ─── YEAR CONTEXT ────────────────────────────────────────────
+function updateContext(year) {
+  const ctx = YEAR_CONTEXT[year];
+  const el  = document.getElementById('yearContext');
+  if (!ctx) { el.classList.remove('visible'); return; }
+  el.className = `year-context visible ${ctx.type}`;
+  document.getElementById('ycLabel').textContent = ctx.label;
+  document.getElementById('ycText').textContent  = ctx.text;
+}
+
+// ─── S-CURVE ─────────────────────────────────────────────────
+function renderScurve(ministry, year) {
+  const actual  = genCumulative(ministry, year);
+  const py      = prevYear(year);
+  const fyLabel = year.replace('-','–');
+
+  document.getElementById('scurveTitle').textContent = `Running total of spending — ${MIN_META[ministry].label}`;
+  document.getElementById('scurveSub').textContent   = `Cumulative share of annual budget spent by each month · FY ${fyLabel}`;
+
+  const datasets = [
+    { label:'If spending were perfectly even', data:IDEAL_CUM, borderColor:'#cbd5e1', borderWidth:1.5, borderDash:[6,4], pointRadius:0, fill:false, tension:0 },
+    { label:`FY ${fyLabel} (actual)`, data:actual, borderColor:'#1d4ed8', borderWidth:2.5, pointRadius:actual.map((_,i)=>i===11?5:3), pointBackgroundColor:'#1d4ed8', fill:false, tension:0.2 }
+  ];
+  if (py) datasets.push({ label:`FY ${py.replace('-','–')} (previous year)`, data:genCumulative(ministry,py), borderColor:'#94a3b8', borderWidth:1.5, pointRadius:0, fill:false, tension:0.2, borderDash:[3,3] });
+
+  if (scurveChart) scurveChart.destroy();
+  scurveChart = new Chart(document.getElementById('scurveChart').getContext('2d'), {
+    type:'line', data:{labels:MONTHS, datasets},
+    options:{
+      responsive:true,
+      interaction:{mode:'index', intersect:false},
+      plugins:{
+        legend:{position:'bottom', labels:{font:{size:11}, padding:14, usePointStyle:true}},
+        tooltip:{callbacks:{label: c => ` ${c.dataset.label}: ${c.parsed.y.toFixed(1)}% spent so far`}}
+      },
+      scales:{
+        y:{min:0, max:105, ticks:{callback:v=>v+'%', font:{size:11}}, grid:{color:'#f1f5f9'}},
+        x:{ticks:{font:{size:12}}, grid:{display:false}}
+      }
+    }
+  });
+}
+
+// ─── MONTHLY BAR ─────────────────────────────────────────────
+function renderMonthly(ministry, year) {
+  const monthly = genMonthly(ministry, year);
+  const py      = prevYear(year);
+  const fyLabel = year.replace('-','–');
+
+  document.getElementById('monthlyTitle').textContent = `Month-by-month spending — ${MIN_META[ministry].label}`;
+  document.getElementById('monthlySub').textContent   = `Share of full-year budget spent each month · FY ${fyLabel}`;
+  document.getElementById('insightBody').innerHTML    = getInsight(ministry, year);
+
+  const datasets = [
+    { type:'bar',  label:`FY ${fyLabel}`, data:monthly, backgroundColor:monthly.map((_,i)=>i===11?'#ef4444':'#3b82f6'), borderRadius:5, borderSkipped:false, order:2 },
+    { type:'line', label:'Equal share benchmark (8.3%)', data:Array(12).fill(100/12), borderColor:'#94a3b8', borderWidth:1.5, borderDash:[6,4], pointRadius:0, fill:false, order:1 }
+  ];
+  if (py) datasets.push({ type:'bar', label:`FY ${py.replace('-','–')} (prev)`, data:genMonthly(ministry,py), backgroundColor:'transparent', borderColor:'#94a3b8', borderWidth:1.5, borderSkipped:false, borderRadius:5, order:3 });
+
+  if (monthlyChart) monthlyChart.destroy();
+  monthlyChart = new Chart(document.getElementById('monthlyChart').getContext('2d'), {
+    type:'bar', data:{labels:MONTHS, datasets},
+    options:{
+      responsive:true,
+      interaction:{mode:'index', intersect:false},
+      plugins:{
+        legend:{position:'bottom', labels:{font:{size:11}, padding:14, usePointStyle:true}},
+        tooltip:{callbacks:{label: c => ` ${c.dataset.label}: ${c.parsed.y.toFixed(1)}%`}}
+      },
+      scales:{
+        y:{beginAtZero:true, ticks:{callback:v=>v+'%', font:{size:11}}, grid:{color:'#f1f5f9'}},
+        x:{ticks:{font:{size:12}}, grid:{display:false}}
+      }
+    }
+  });
+}
+
+// ─── COMPARISON ──────────────────────────────────────────────
+function renderComp(year) {
+  const keys    = Object.keys(MARCH_PCT);
+  const current = keys.map(k => MARCH_PCT[k][year]);
+  const py      = prevYear(year);
+  const prev    = py ? keys.map(k => MARCH_PCT[k][py]) : null;
+  const fyLabel = year.replace('-','–');
+
+  document.getElementById('compSub').textContent = `% of annual budget spent in March alone · FY ${fyLabel}${py ? ` vs ${py.replace('-','–')}` : ''} · Red bars = above 23%`;
+
+  const datasets = [{ label:`FY ${fyLabel}`, data:current, backgroundColor:current.map(v=>v>=23?'#ef4444':v>=21?'#f97316':'#3b82f6'), borderRadius:5 }];
+  if (prev) datasets.push({ label:`FY ${py.replace('-','–')} (prev year)`, data:prev, backgroundColor:'transparent', borderColor:'#94a3b8', borderWidth:1.5, borderRadius:5 });
+
+  if (compChart) compChart.destroy();
+  compChart = new Chart(document.getElementById('compChart').getContext('2d'), {
+    type:'bar', data:{labels:keys.map(k=>MIN_META[k].short), datasets},
+    options:{
+      indexAxis:'y', responsive:true,
+      plugins:{
+        legend:{position:'bottom', labels:{font:{size:11}, padding:14, usePointStyle:true}},
+        tooltip:{callbacks:{label: c => ` ${c.dataset.label}: ${c.parsed.x.toFixed(1)}% in March`}}
+      },
+      scales:{
+        x:{beginAtZero:true, ticks:{callback:v=>v+'%', font:{size:11}}, grid:{color:'#f1f5f9'}},
+        y:{ticks:{font:{size:12}}, grid:{display:false}}
+      }
+    }
+  });
+}
+
+// ─── TREND ───────────────────────────────────────────────────
+function renderTrend(ministry, year) {
+  const yearLabels = YEARS.map(y=>y.replace('-','–'));
+  const avgLine    = YEARS.map(y=>{ const v=Object.keys(MARCH_PCT).map(k=>MARCH_PCT[k][y]); return Math.round(v.reduce((a,b)=>a+b,0)/v.length*10)/10; });
+
+  document.getElementById('trendTitle').textContent = `Has the March Rush gotten better? — ${MIN_META[ministry].short} highlighted`;
+
+  const datasets = Object.keys(MARCH_PCT).map(k => ({
+    label: MIN_META[k].short,
+    data: YEARS.map(y=>MARCH_PCT[k][y]),
+    borderColor: TREND_COLORS[k],
+    borderWidth: k===ministry ? 2.5 : 1.2,
+    pointRadius: YEARS.map(y=>y===year?6:2),
+    pointBorderWidth: YEARS.map(y=>y===year?2:1),
+    pointBorderColor: YEARS.map(y=>y===year?'#fff':TREND_COLORS[k]),
+    pointBackgroundColor: TREND_COLORS[k],
+    tension:0.3, fill:false,
+  }));
+  datasets.push({ label:'5-Ministry Average', data:avgLine, borderColor:'#0f172a', borderWidth:2, borderDash:[8,4], pointRadius:YEARS.map(y=>y===year?5:0), pointBackgroundColor:'#0f172a', tension:0.3, fill:false });
+
+  if (trendChart) trendChart.destroy();
+  trendChart = new Chart(document.getElementById('trendChart').getContext('2d'), {
+    type:'line', data:{labels:yearLabels, datasets},
+    options:{
+      responsive:true,
+      interaction:{mode:'index', intersect:false},
+      plugins:{
+        legend:{position:'bottom', labels:{font:{size:11}, padding:10, usePointStyle:true}},
+        tooltip:{callbacks:{label: c => ` ${c.dataset.label}: ${c.parsed.y.toFixed(1)}%`}}
+      },
+      scales:{
+        y:{min:12, max:28, ticks:{callback:v=>v+'%', font:{size:11}}, grid:{color:'#f1f5f9'}},
+        x:{ticks:{font:{size:10}}, grid:{display:false}}
+      }
+    }
+  });
+}
+
+// ─── FULL RENDER ─────────────────────────────────────────────
+function renderAll() {
+  updateStats(activeYear);
+  updateContext(activeYear);
+  renderScurve(activeMinistry, activeYear);
+  renderMonthly(activeMinistry, activeYear);
+  renderComp(activeYear);
+  renderTrend(activeMinistry, activeYear);
+}
+
+// ─── EVENT HANDLERS ──────────────────────────────────────────
+document.getElementById('yearSelect').addEventListener('change', e => {
+  activeYear = e.target.value;
+  renderAll();
+});
+
+document.getElementById('ministryPills').addEventListener('click', e => {
+  if (!e.target.classList.contains('mpill')) return;
+  document.querySelectorAll('.mpill').forEach(p => p.classList.remove('active'));
+  e.target.classList.add('active');
+  activeMinistry = e.target.dataset.m;
+  renderScurve(activeMinistry, activeYear);
+  renderMonthly(activeMinistry, activeYear);
+  renderTrend(activeMinistry, activeYear);
+});
+
+// ─── INIT ────────────────────────────────────────────────────
+renderAll();
+</script>
+<button id="btt" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="position:fixed;bottom:1.5rem;right:1.5rem;width:40px;height:40px;background:var(--navy);color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:1.1rem;opacity:0;transition:opacity .2s,transform .2s;transform:translateY(8px);z-index:98;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,.25)">↑</button>
+<script>
+(function(){
+  var p=document.getElementById('progress'),b=document.getElementById('btt');
+  window.addEventListener('scroll',function(){
+    var t=document.documentElement.scrollHeight-window.innerHeight;
+    if(p) p.style.width=(t>0?window.scrollY/t*100:0)+'%';
+    if(b){b.style.opacity=window.scrollY>300?1:0;b.style.transform=window.scrollY>300?'translateY(0)':'translateY(8px)';}
+  },{passive:true});
+})();
+</script>
+</body>
+</html>

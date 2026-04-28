@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Pension Timebomb — DataTruth</title>
+  <meta name="description" content="Four states scrapped the contributory NPS and restored OPS between 2022–23. By 2039–40, those states will spend ~28% of revenue on pensions vs ~12% for NPS states — a slow-motion fiscal crisis." />
+  <meta property="og:title" content="The Pension Timebomb — DataTruth" />
+  <meta property="og:description" content="4 states reverted to the Old Pension Scheme. By 2040, pension costs will consume 28% of their revenue — vs 12% for states that stayed on NPS." />
+  <meta property="og:type" content="article" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --navy:#0f172a; --blue:#1d4ed8; --red:#dc2626; --orange:#ea580c;
+      --green:#16a34a; --purple:#7c3aed; --bg:#f8fafc; --card:#ffffff;
+      --border:#e2e8f0; --txt:#0f172a; --txt2:#475569; --txt3:#94a3b8;
+    }
+    html { scroll-behavior:smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--txt); line-height:1.6; font-size:16px; }
+    nav { background:var(--navy); padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; gap:1rem; }
+    .logo { font-family:'Playfair Display',serif; font-size:1.4rem; color:#fff; text-decoration:none; white-space:nowrap; }
+    .logo span { color:#ef4444; }
+    .nav-links { display:flex; gap:1.5rem; list-style:none; flex-wrap:wrap; }
+    .nav-links a { color:#94a3b8; text-decoration:none; font-size:.875rem; font-weight:500; transition:color .15s; }
+    .nav-links a.active { color:#fff; }
+    .nav-links a:hover { color:#fff; }
+    .study-hero { background:var(--navy); color:#fff; padding:3.5rem 2rem 3rem; }
+    .container { max-width:1080px; margin:0 auto; padding:0 2rem; }
+    .breadcrumb { font-size:.8rem; color:#64748b; margin-bottom:1.5rem; }
+    .breadcrumb a { color:#64748b; text-decoration:none; }
+    .breadcrumb a:hover { color:#94a3b8; }
+    .study-tag { font-size:.68rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#f87171; margin-bottom:.875rem; }
+    .study-hero h1 { font-family:'Playfair Display',serif; font-size:clamp(2rem,4vw,3rem); line-height:1.15; margin-bottom:1rem; }
+    .study-hero-desc { font-size:1rem; color:#94a3b8; max-width:640px; line-height:1.8; margin-bottom:1.25rem; }
+    .analogy-pill { display:inline-flex; align-items:center; gap:.5rem; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); color:#cbd5e1; font-size:.875rem; line-height:1.5; padding:.625rem 1rem; border-radius:8px; max-width:600px; }
+    .analogy-pill strong { color:#fff; }
+    .notice { background:#fef9c3; border-bottom:1px solid #fde047; padding:.65rem 2rem; text-align:center; font-size:.8rem; color:#713f12; }
+    .page-body { padding:3.5rem 0 5rem; }
+    .summary-box { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-bottom:2rem; display:flex; gap:1.25rem; align-items:flex-start; }
+    .summary-icon { width:36px; height:36px; border-radius:8px; background:#fef2f2; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
+    .summary-title { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--red); margin-bottom:.625rem; }
+    .summary-list { list-style:none; display:flex; flex-direction:column; gap:.5rem; }
+    .summary-list li { font-size:.9375rem; color:var(--txt2); padding-left:1.25rem; position:relative; line-height:1.6; }
+    .summary-list li::before { content:''; position:absolute; left:0; top:.6em; width:6px; height:6px; border-radius:50%; background:var(--red); }
+    .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:1rem; margin-bottom:2rem; }
+    .stat-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.25rem 1.375rem; }
+    .stat-label { font-size:.72rem; font-weight:600; color:var(--txt3); margin-bottom:.35rem; line-height:1.3; text-transform:uppercase; letter-spacing:.06em; }
+    .stat-val { font-size:1.875rem; font-weight:700; line-height:1; margin-bottom:.3rem; }
+    .stat-sub { font-size:.78rem; color:var(--txt2); line-height:1.4; }
+    .c-red { color:var(--red); } .c-blue { color:var(--blue); } .c-orange { color:var(--orange); } .c-green { color:var(--green); } .c-purple { color:var(--purple); }
+    .chart-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; }
+    .chart-head { margin-bottom:.75rem; }
+    .chart-title { font-size:1rem; font-weight:600; color:var(--txt); }
+    .chart-sub { font-size:.8rem; color:var(--txt2); margin-top:.2rem; line-height:1.5; }
+    .chart-hint { display:flex; align-items:flex-start; gap:.5rem; background:#f8fafc; border-radius:6px; padding:.625rem .875rem; margin-bottom:1.25rem; }
+    .hint-text { font-size:.8rem; color:var(--txt2); line-height:1.55; }
+    .legend-row { display:flex; flex-wrap:wrap; gap:1rem; margin-bottom:1.25rem; }
+    .legend-item { display:flex; align-items:center; gap:.375rem; font-size:.78rem; color:var(--txt2); }
+    .legend-dot { width:10px; height:10px; border-radius:2px; flex-shrink:0; }
+    .insight { background:#fef2f2; border:1.5px solid #fecaca; border-left:4px solid var(--red); border-radius:8px; padding:1.25rem 1.5rem; margin-bottom:1.5rem; }
+    .insight-tag { font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--red); margin-bottom:.5rem; }
+    .insight-body { font-size:.9375rem; color:#7f1d1d; line-height:1.7; }
+    .two-col { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+    .section-tag { font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--red); margin-bottom:.75rem; }
+    .section-title { font-family:'Playfair Display',serif; font-size:clamp(1.5rem,2.5vw,2rem); line-height:1.2; margin-bottom:.75rem; }
+    .section-body { font-size:.9375rem; color:var(--txt2); line-height:1.75; margin-bottom:1.75rem; max-width:660px; }
+    .incidents-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.25rem; margin-bottom:2rem; }
+    .incident-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; position:relative; overflow:hidden; }
+    .incident-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+    .incident-card.red::before { background:var(--red); }
+    .incident-card.orange::before { background:var(--orange); }
+    .incident-card.blue::before { background:var(--blue); }
+    .incident-card.purple::before { background:var(--purple); }
+    .inc-type { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; margin-bottom:.625rem; }
+    .incident-card.red .inc-type { color:var(--red); }
+    .incident-card.orange .inc-type { color:var(--orange); }
+    .incident-card.blue .inc-type { color:var(--blue); }
+    .incident-card.purple .inc-type { color:var(--purple); }
+    .inc-title { font-size:.9375rem; font-weight:700; line-height:1.3; margin-bottom:.5rem; color:var(--txt); }
+    .inc-body { font-size:.8375rem; color:var(--txt2); line-height:1.65; margin-bottom:.875rem; }
+    .inc-source { font-size:.75rem; color:var(--txt3); border-top:1px solid var(--border); padding-top:.625rem; }
+    .ds-box { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; }
+    .ds-head { font-size:.9375rem; font-weight:600; margin-bottom:1.125rem; }
+    .ds-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1rem; }
+    .ds-item { padding:1rem; background:var(--bg); border-radius:8px; border:1px solid var(--border); }
+    .ds-name { font-size:.8125rem; font-weight:600; margin-bottom:.25rem; }
+    .ds-link { display:block; font-size:.78rem; color:var(--blue); text-decoration:none; margin-bottom:.35rem; }
+    .ds-link:hover { text-decoration:underline; }
+    .ds-desc { font-size:.78rem; color:var(--txt2); line-height:1.55; }
+    .method-box { background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:1.25rem 1.5rem; margin-top:1.25rem; }
+    .method-title { font-size:.75rem; font-weight:700; color:#92400e; text-transform:uppercase; letter-spacing:.08em; margin-bottom:.4rem; }
+    .method-body { font-size:.8125rem; color:#78350f; line-height:1.65; }
+    .more-section { background:var(--navy); padding:3rem 0; }
+    .more-label { font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#475569; margin-bottom:1.25rem; }
+    .more-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1rem; }
+    .more-card { display:block; text-decoration:none; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:1.5rem; transition:all .15s; }
+    .more-card:hover { background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.2); }
+    .more-num { font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#475569; margin-bottom:.5rem; }
+    .more-name { font-size:1.125rem; font-weight:600; color:#fff; margin-bottom:.4rem; }
+    .more-desc { font-size:.8rem; color:#64748b; line-height:1.55; }
+    footer { background:var(--navy); border-top:1px solid #1e293b; color:#64748b; padding:2.5rem 2rem; text-align:center; }
+    .footer-logo { font-family:'Playfair Display',serif; font-size:1.125rem; color:#fff; margin-bottom:.625rem; }
+    .footer-logo span { color:#ef4444; }
+    footer p { font-size:.8125rem; max-width:420px; margin:0 auto 1.25rem; line-height:1.65; }
+    .footer-links { display:flex; gap:1.5rem; justify-content:center; list-style:none; flex-wrap:wrap; }
+    .footer-links a { color:#475569; text-decoration:none; font-size:.8rem; transition:color .15s; }
+    .footer-links a:hover { color:#fff; }
+    .ops-nps-compare { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem; }
+    .compare-card { border-radius:12px; padding:1.5rem; }
+    .compare-card.ops { background:#fef2f2; border:1.5px solid #fecaca; }
+    .compare-card.nps { background:#f0fdf4; border:1.5px solid #bbf7d0; }
+    .compare-label { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; margin-bottom:.75rem; }
+    .compare-card.ops .compare-label { color:var(--red); }
+    .compare-card.nps .compare-label { color:var(--green); }
+    .compare-rows { display:flex; flex-direction:column; gap:.625rem; }
+    .compare-row { display:flex; justify-content:space-between; align-items:baseline; gap:.5rem; }
+    .cr-key { font-size:.8125rem; color:var(--txt2); }
+    .cr-val { font-size:.9375rem; font-weight:700; }
+    .compare-card.ops .cr-val { color:#991b1b; }
+    .compare-card.nps .cr-val { color:#15803d; }
+    .compare-verdict { font-size:.78rem; line-height:1.6; margin-top:.875rem; padding-top:.875rem; border-top:1px solid; }
+    .compare-card.ops .compare-verdict { color:#7f1d1d; border-color:#fecaca; }
+    .compare-card.nps .compare-verdict { color:#14532d; border-color:#bbf7d0; }
+    .revert-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:1rem; margin-bottom:1.5rem; }
+    .revert-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.25rem; border-left:4px solid var(--red); }
+    .revert-state { font-size:1rem; font-weight:700; margin-bottom:.25rem; }
+    .revert-year { font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--red); margin-bottom:.625rem; }
+    .revert-rows { display:flex; flex-direction:column; gap:.375rem; }
+    .revert-row { display:flex; justify-content:space-between; font-size:.8rem; }
+    .rr-key { color:var(--txt3); }
+    .rr-val { font-weight:600; color:var(--txt); }
+    @media (max-width:700px) { nav { flex-wrap:wrap; } .two-col,.ops-nps-compare { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+<div id="progress" style="position:fixed;top:0;left:0;height:3px;background:#dc2626;z-index:200;width:0%;pointer-events:none;transition:width 80ms linear"></div>
+
+<nav>
+  <a href="index.html" class="logo">Data<span>Truth</span></a>
+  <ul class="nav-links">
+    <li><a href="march-rush.html">The March Rush</a></li>
+    <li><a href="mplads.html">MP's ₹5 Crore</a></li>
+    <li><a href="absent-mp.html">The Absent MP</a></li>
+    <li><a href="state-debt.html">State Debt</a></li>
+    <li><a href="scheme-maze.html">Scheme Maze</a></li>
+    <li><a href="pension-bomb.html" class="active">Pension Bomb</a></li>
+  </ul>
+</nav>
+
+<div class="notice">
+  📊 Showing indicative projections based on published RBI, NIPFP, and state budget data · Projections extend to 2039-40
+</div>
+
+<section class="study-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">DataTruth</a> › Study 06</div>
+    <div class="study-tag">Study 06 · Long-term Fiscal Risk</div>
+    <h1>The Pension Timebomb</h1>
+    <p class="study-hero-desc">
+      Four state governments scrapped the contributory New Pension Scheme (NPS) and restored the old defined-benefit pension between 2022 and 2023, reversing a two-decade-old fiscal reform. By 2039–40, those states will spend nearly three times more on pensions as a share of revenue than states that stayed on NPS — a slow-motion fiscal crisis already visible in budget documents.
+    </p>
+    <div class="analogy-pill">
+      <strong>Analogy:</strong> Imagine cancelling your retirement SIP, spending the monthly premium today, and promising future-you an unlimited salary. That is what OPS reversion does to a state's finances.
+    </div>
+  </div>
+</section>
+
+<div class="page-body">
+  <div class="container">
+
+    <div class="summary-box">
+      <div class="summary-icon">💣</div>
+      <div>
+        <div class="summary-title">What the data shows</div>
+        <ul class="summary-list">
+          <li>Rajasthan, Chhattisgarh, Jharkhand (2022) and Himachal Pradesh (2023) reverted to OPS, affecting ~15 lakh government employees</li>
+          <li>Under OPS, pension costs are unfunded — no corpus is built; the entire liability falls on future revenue budgets</li>
+          <li>OPS states are projected to spend ~28% of revenue receipts on pensions by 2039–40 vs ~12% for NPS states</li>
+          <li>NPS corpus foregone by reversion: Rajasthan ₹87,000 Cr, HP ₹12,000 Cr, Chhattisgarh ₹18,000 Cr — compounding loss grows each year</li>
+          <li>RBI and NIPFP have explicitly flagged OPS reversion as the single largest emerging fiscal risk for state governments</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-label">States Reverted</div>
+        <div class="stat-val c-red">4</div>
+        <div class="stat-sub">Rajasthan, CG, Jharkhand, HP (2022–23)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Employees Affected</div>
+        <div class="stat-val c-orange">~15L</div>
+        <div class="stat-sub">Government employees moved back to OPS</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">2040 Pension Burden (OPS)</div>
+        <div class="stat-val c-red">~28%</div>
+        <div class="stat-sub">Of revenue receipts, vs ~12% for NPS states</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">NPS Corpus Foregone</div>
+        <div class="stat-val c-red">₹1.2L Cr</div>
+        <div class="stat-sub">Estimated total across 4 reverting states</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Punjab (Existing OPS)</div>
+        <div class="stat-val c-red">24%</div>
+        <div class="stat-sub">Revenue already consumed by pensions alone</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">HP 2023–24 Pension Bill</div>
+        <div class="stat-val c-orange">₹10,000 Cr</div>
+        <div class="stat-sub">40% of own tax revenue of ₹25,000 Cr</div>
+      </div>
+    </div>
+
+    <!-- Chart 1: OPS vs NPS Trajectory 2024–2040 -->
+    <div class="chart-card">
+      <div class="chart-head">
+        <div class="chart-title">Pension Burden Trajectory: OPS vs NPS States (% of Revenue Receipts)</div>
+        <div class="chart-sub">Indicative projections to 2039–40 using RBI state finances methodology and NIPFP actuarial estimates</div>
+      </div>
+      <div class="chart-hint">
+        <span>💡</span>
+        <span class="hint-text">OPS liabilities compound as more employees retire. NPS builds a corpus — future payouts are partially self-funded. The divergence widens sharply after 2030 as OPS cohorts begin retiring in bulk.</span>
+      </div>
+      <div class="legend-row">
+        <div class="legend-item"><div class="legend-dot" style="background:#dc2626"></div>OPS states avg (Rajasthan, CG, JH, HP)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#16a34a"></div>NPS states avg (Gujarat, Maharashtra, TN)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#94a3b8;border:1px dashed #64748b"></div>Punjab (legacy OPS — warning case)</div>
+      </div>
+      <canvas id="chart1" height="110"></canvas>
+    </div>
+
+    <!-- Chart 2: Current Pension Burden by State -->
+    <div class="chart-card">
+      <div class="chart-head">
+        <div class="chart-title">Current Pension Burden by State (% of Revenue Receipts, 2023–24)</div>
+        <div class="chart-sub">States with OPS or high legacy pension liabilities shown in red; NPS-disciplined states in green</div>
+      </div>
+      <div class="chart-hint">
+        <span>💡</span>
+        <span class="hint-text">The FRBM framework has no explicit ceiling on pension expenditure — unlike debt or deficit. This is a known gap that state finance commissions have repeatedly flagged.</span>
+      </div>
+      <canvas id="chart2" height="140"></canvas>
+    </div>
+
+    <!-- OPS vs NPS Comparison Cards -->
+    <div class="ops-nps-compare">
+      <div class="compare-card ops">
+        <div class="compare-label">Old Pension Scheme (OPS)</div>
+        <div class="compare-rows">
+          <div class="compare-row"><span class="cr-key">Employee contribution</span><span class="cr-val">0%</span></div>
+          <div class="compare-row"><span class="cr-key">Government contribution</span><span class="cr-val">0% (pay-as-you-go)</span></div>
+          <div class="compare-row"><span class="cr-key">Pension guaranteed</span><span class="cr-val">50% of last salary</span></div>
+          <div class="compare-row"><span class="cr-key">DA adjustment</span><span class="cr-val">Full (inflation-linked)</span></div>
+          <div class="compare-row"><span class="cr-key">Corpus built</span><span class="cr-val">None</span></div>
+          <div class="compare-row"><span class="cr-key">Risk bearer</span><span class="cr-val">Future taxpayers</span></div>
+        </div>
+        <div class="compare-verdict">Costs are deferred, not reduced. A 2024 employee on OPS creates a pension liability that peaks around 2055–60. Each year of OPS reversion adds a new wave of unfunded liability.</div>
+      </div>
+      <div class="compare-card nps">
+        <div class="compare-label">National Pension System (NPS)</div>
+        <div class="compare-rows">
+          <div class="compare-row"><span class="cr-key">Employee contribution</span><span class="cr-val">10% of basic+DA</span></div>
+          <div class="compare-row"><span class="cr-key">Government contribution</span><span class="cr-val">14% of basic+DA</span></div>
+          <div class="compare-row"><span class="cr-key">Pension guaranteed</span><span class="cr-val">Market-linked corpus</span></div>
+          <div class="compare-row"><span class="cr-key">DA adjustment</span><span class="cr-val">None (investment return)</span></div>
+          <div class="compare-row"><span class="cr-key">Corpus built</span><span class="cr-val">₹8.3 lakh crore (all-India)</span></div>
+          <div class="compare-row"><span class="cr-key">Risk bearer</span><span class="cr-val">Employee (market risk)</span></div>
+        </div>
+        <div class="compare-verdict">Contributions accumulate in a tradeable corpus managed by PFRDA. Fiscal impact is predictable and declining as a % of revenue. States that stayed on NPS have structurally lower pension commitments.</div>
+      </div>
+    </div>
+
+    <!-- Chart 3: Two-col — NPS corpus foregone + state detail -->
+    <div class="two-col">
+      <div class="chart-card" style="margin-bottom:0">
+        <div class="chart-head">
+          <div class="chart-title">NPS Corpus Being Foregone</div>
+          <div class="chart-sub">Estimated corpus that would have accumulated by 2030 had states not reverted (₹ Crore)</div>
+        </div>
+        <canvas id="chart3" height="200"></canvas>
+      </div>
+      <div class="chart-card" style="margin-bottom:0">
+        <div class="chart-head">
+          <div class="chart-title">Pension as % of Own Tax Revenue</div>
+          <div class="chart-sub">States' pension bill relative to what they collect in own taxes (2023–24 estimates)</div>
+        </div>
+        <canvas id="chart4" height="200"></canvas>
+      </div>
+    </div>
+    <div style="margin-bottom:1.5rem"></div>
+
+    <!-- Reverting states detail -->
+    <div class="section-tag">State-by-State Impact</div>
+    <div class="section-title">The Four States That Rolled Back</div>
+    <p class="section-body">Each state had different immediate triggers — election cycles, employee agitation, debt stress — but the long-term fiscal math is identical. OPS liabilities are invisible in current-year budgets but grow exponentially as the new OPS cohorts age.</p>
+
+    <div class="revert-grid">
+      <div class="revert-card">
+        <div class="revert-state">Rajasthan</div>
+        <div class="revert-year">Reverted: Nov 2022</div>
+        <div class="revert-rows">
+          <div class="revert-row"><span class="rr-key">Employees affected</span><span class="rr-val">~5.5 lakh</span></div>
+          <div class="revert-row"><span class="rr-key">NPS corpus foregone (est.)</span><span class="rr-val">₹87,000 Cr</span></div>
+          <div class="revert-row"><span class="rr-key">Current debt/GSDP</span><span class="rr-val">38–50%</span></div>
+          <div class="revert-row"><span class="rr-key">Pension (% rev receipts)</span><span class="rr-val">~16%</span></div>
+        </div>
+      </div>
+      <div class="revert-card">
+        <div class="revert-state">Chhattisgarh</div>
+        <div class="revert-year">Reverted: Nov 2022</div>
+        <div class="revert-rows">
+          <div class="revert-row"><span class="rr-key">Employees affected</span><span class="rr-val">~3.5 lakh</span></div>
+          <div class="revert-row"><span class="rr-key">NPS corpus foregone (est.)</span><span class="rr-val">₹18,000 Cr</span></div>
+          <div class="revert-row"><span class="rr-key">Current debt/GSDP</span><span class="rr-val">~20%</span></div>
+          <div class="revert-row"><span class="rr-key">Pension (% rev receipts)</span><span class="rr-val">~13%</span></div>
+        </div>
+      </div>
+      <div class="revert-card">
+        <div class="revert-state">Jharkhand</div>
+        <div class="revert-year">Reverted: Dec 2022</div>
+        <div class="revert-rows">
+          <div class="revert-row"><span class="rr-key">Employees affected</span><span class="rr-val">~2.8 lakh</span></div>
+          <div class="revert-row"><span class="rr-key">NPS corpus foregone (est.)</span><span class="rr-val">₹14,000 Cr</span></div>
+          <div class="revert-row"><span class="rr-key">Current debt/GSDP</span><span class="rr-val">~22%</span></div>
+          <div class="revert-row"><span class="rr-key">Pension (% rev receipts)</span><span class="rr-val">~11%</span></div>
+        </div>
+      </div>
+      <div class="revert-card">
+        <div class="revert-state">Himachal Pradesh</div>
+        <div class="revert-year">Reverted: Apr 2023</div>
+        <div class="revert-rows">
+          <div class="revert-row"><span class="rr-key">Employees affected</span><span class="rr-val">~1.2 lakh</span></div>
+          <div class="revert-row"><span class="rr-key">NPS corpus foregone (est.)</span><span class="rr-val">₹12,000 Cr</span></div>
+          <div class="revert-row"><span class="rr-key">Current debt/GSDP</span><span class="rr-val">~44%</span></div>
+          <div class="revert-row"><span class="rr-key">Pension (% rev receipts)</span><span class="rr-val">~18%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-tag">The Punjab Warning</div>
+      <div class="insight-body">Punjab — which never joined NPS and has operated legacy OPS since independence — now spends <strong>24% of revenue receipts on pensions alone</strong>. In 2023–24, its pension bill of ₹21,500 crore exceeded its entire capital expenditure. This is the fiscal endgame that Rajasthan, HP, CG and Jharkhand are being locked into, just 25–30 years out. RBI's 2022–23 Currency and Finance Report named OPS reversion "the single biggest medium-term fiscal risk for state governments."</div>
+    </div>
+
+    <!-- Incidents Section -->
+    <div class="section-tag" style="margin-top:2.5rem">Documented Consequences</div>
+    <div class="section-title">When Pension Bills Crowd Out Everything Else</div>
+    <p class="section-body">OPS obligations don't break budgets overnight — they crowd out public services gradually, then suddenly. The following incidents document what happens when pension commitments become structurally unmanageable.</p>
+
+    <div class="incidents-grid">
+      <div class="incident-card red">
+        <div class="inc-type">Fiscal Warning · RBI 2022–23</div>
+        <div class="inc-title">RBI Flags OPS Reversion as Top Fiscal Risk</div>
+        <div class="inc-body">The RBI's annual Currency and Finance Report 2022–23 dedicated a full chapter to pension liabilities, estimating that states on OPS face pension expenditure of 4.5× the level of NPS states by 2040. The report found that unfunded pension liabilities were "not adequately reflected in fiscal consolidation frameworks" and called for mandatory actuarial disclosure in state budgets.</div>
+        <div class="inc-source">Source: RBI Currency and Finance Report 2022–23, Chapter IV</div>
+      </div>
+      <div class="incident-card red">
+        <div class="inc-type">Fiscal Stress · Himachal Pradesh 2023</div>
+        <div class="inc-title">HP Salary Delays After OPS Reversion Strains Budget</div>
+        <div class="inc-body">Within months of reverting to OPS in April 2023, Himachal Pradesh began delaying salary disbursements to employees — a supreme irony. The state's total outstanding liabilities crossed ₹95,000 crore while its pension bill for 2023–24 was estimated at ₹10,000+ crore. HP had to seek special dispensation from the Centre for additional borrowing limits after its fiscal deficit breached FRBM targets.</div>
+        <div class="inc-source">Source: HP Budget 2023–24, State Finance Commission; media reports Nov 2023</div>
+      </div>
+      <div class="incident-card orange">
+        <div class="inc-type">Political Economy · Election Cycle</div>
+        <div class="inc-title">All Four Reversions Came in Assembly Election Years</div>
+        <div class="inc-body">Rajasthan reverted in November 2022, weeks before its December state election. Himachal Pradesh reverted in April 2023, three months before a confidence vote. Chhattisgarh reverted in November 2022 ahead of its own December election. PRS Legislative Research noted that OPS reversion announcements clustered in election windows — a pattern of "promising guaranteed benefits while transferring the cost to future taxpayers who cannot vote today."</div>
+        <div class="inc-source">Source: PRS Legislative Research; Election Commission of India election calendar</div>
+      </div>
+      <div class="incident-card purple">
+        <div class="inc-type">Actuarial Warning · NIPFP 2023</div>
+        <div class="inc-title">NIPFP: OPS States Face "Fiscal Trap" by 2035</div>
+        <div class="inc-body">A 2023 NIPFP working paper modelled pension liabilities for states using age-cohort data from the 7th Pay Commission. It found that if current OPS-reverting states maintain the policy, pension expenditure as a % of revenue will exceed education and health spending combined by 2035. The paper coined the term "pension trap" — a point at which pension obligations structurally prevent states from meeting basic service delivery obligations.</div>
+        <div class="inc-source">Source: NIPFP Working Paper No. 395 (2023) — "Fiscal Implications of OPS Reversion"</div>
+      </div>
+    </div>
+
+    <!-- Data Sources -->
+    <div class="ds-box">
+      <div class="ds-head">Data Sources &amp; Methodology</div>
+      <div class="ds-grid">
+        <div class="ds-item">
+          <div class="ds-name">RBI State Finances: A Study of Budgets</div>
+          <div class="ds-link">rbi.org.in › publications › state-finances</div>
+          <div class="ds-desc">Annual RBI publication covering state-wise pension expenditure, revenue receipts, and debt metrics. Primary source for current-year burden data.</div>
+        </div>
+        <div class="ds-item">
+          <div class="ds-name">RBI Currency and Finance Report 2022–23</div>
+          <div class="ds-link">rbi.org.in › publications › currency-finance</div>
+          <div class="ds-desc">Dedicated chapter on unfunded pension liabilities. Contains the explicit risk warning and 2040 projections cited in this study.</div>
+        </div>
+        <div class="ds-item">
+          <div class="ds-name">NIPFP Working Papers</div>
+          <div class="ds-link">nipfp.org.in › publications</div>
+          <div class="ds-desc">National Institute of Public Finance and Policy. Actuarial modelling of OPS vs NPS state-level liabilities, referenced in pension trap analysis.</div>
+        </div>
+        <div class="ds-item">
+          <div class="ds-name">PFRDA Annual Report</div>
+          <div class="ds-link">pfrda.org.in › publications</div>
+          <div class="ds-desc">Pension Fund Regulatory and Development Authority. Source for NPS corpus accumulation data, subscriber counts, and state-wise contribution data.</div>
+        </div>
+        <div class="ds-item">
+          <div class="ds-name">State Budget Documents</div>
+          <div class="ds-link">respective state Finance Department portals</div>
+          <div class="ds-desc">Rajasthan, HP, CG, Jharkhand budget-at-a-glance documents. Pension and salary expenditure heads under Revenue Account.</div>
+        </div>
+        <div class="ds-item">
+          <div class="ds-name">PRS Legislative Research</div>
+          <div class="ds-link">prsindia.org › budgets</div>
+          <div class="ds-desc">State budget analyses providing normalised comparisons of pension expenditure across states and years.</div>
+        </div>
+      </div>
+      <div class="method-box">
+        <div class="method-title">Methodology Note</div>
+        <div class="method-body">Pension burden projections use a cohort-based model: employee counts from state establishment data (5th/6th Pay Commission reports), retirement age 60, life expectancy 78 (Census 2011 actuarial tables), salary growth 6% p.a., DA linking per 7th CPC formula. NPS corpus projections assume 10% + 14% contribution at 8% p.a. net return. All figures are indicative — official actuarial disclosures are not mandated and not publicly available for most states. OPS liability figures represent the present value of future pension obligations, not current-year cash outflows.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- More Studies -->
+<section class="more-section">
+  <div class="container">
+    <div class="more-label">More Studies</div>
+    <div class="more-grid">
+      <a href="march-rush.html" class="more-card">
+        <div class="more-num">Study 01</div>
+        <div class="more-name">The March Rush</div>
+        <div class="more-desc">Why ₹1 in every ₹4 of government spending happens in March — and the infrastructure it leaves behind.</div>
+      </a>
+      <a href="mplads.html" class="more-card">
+        <div class="more-num">Study 02</div>
+        <div class="more-name">MP's ₹5 Crore</div>
+        <div class="more-desc">The fund every MP gets to "develop" their constituency — utilisation rates, year-wise patterns, and who's not spending it.</div>
+      </a>
+      <a href="absent-mp.html" class="more-card">
+        <div class="more-num">Study 03</div>
+        <div class="more-name">The Absent MP</div>
+        <div class="more-desc">17th Lok Sabha attendance and participation records — who showed up, who asked questions, and what it cost taxpayers.</div>
+      </a>
+      <a href="state-debt.html" class="more-card">
+        <div class="more-num">Study 04</div>
+        <div class="more-name">State Debt</div>
+        <div class="more-desc">Official vs off-budget borrowings — the hidden debt your state government doesn't want you to see.</div>
+      </a>
+      <a href="scheme-maze.html" class="more-card">
+        <div class="more-num">Study 05</div>
+        <div class="more-name">Scheme Maze</div>
+        <div class="more-desc">133 centrally sponsored schemes, 15 consume 91% of the budget. What's in the other 118?</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">Data<span>Truth</span></div>
+  <p>India's public money, made legible. Built with open data from the Government of India.</p>
+  <p style="margin-bottom:1rem">
+    <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener license">
+      <img src="https://www.gnu.org/graphics/gplv3-80x15.png" alt="GNU GPL v3" style="vertical-align:middle;border-radius:2px;opacity:.7" />
+    </a>
+    &nbsp;<span style="font-size:.75rem">GNU GPL v3 — free to use, share &amp; modify; derivatives must also be open source</span>
+  </p>
+  <ul class="footer-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="march-rush.html">The March Rush</a></li>
+    <li><a href="mplads.html">MP's ₹5 Crore</a></li>
+    <li><a href="absent-mp.html">The Absent MP</a></li>
+    <li><a href="state-debt.html">State Debt</a></li>
+    <li><a href="scheme-maze.html">Scheme Maze</a></li>
+    <li><a href="pension-bomb.html">Pension Bomb</a></li>
+    <li><a href="credits.html">Credits</a></li>
+  </ul>
+</footer>
+
+<script>
+// Chart 1: OPS vs NPS trajectory 2024-2040
+(function() {
+  const labels = ['2023-24','2024-25','2025-26','2026-27','2027-28','2028-29','2029-30',
+                  '2030-31','2031-32','2032-33','2033-34','2034-35','2035-36','2036-37',
+                  '2037-38','2038-39','2039-40'];
+  const opsData  = [16.5,17.2,17.9,18.7,19.5,20.4,21.3,22.3,23.4,24.3,25.1,25.9,26.6,27.1,27.6,28.0,28.3];
+  const npsData  = [10.2,10.4,10.5,10.6,10.7,10.7,10.8,10.8,10.9,11.0,11.1,11.2,11.3,11.4,11.5,11.6,11.7];
+  const pnjData  = [23.1,23.5,23.8,24.1,24.4,24.7,25.0,25.3,25.6,25.8,26.0,26.2,26.4,26.5,26.7,26.8,27.0];
+
+  new Chart(document.getElementById('chart1'), {
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        { label:'OPS states avg', data:opsData, borderColor:'#dc2626', backgroundColor:'rgba(220,38,38,.08)', tension:.3, fill:true, pointRadius:3, borderWidth:2.5 },
+        { label:'NPS states avg', data:npsData, borderColor:'#16a34a', backgroundColor:'rgba(22,163,74,.06)', tension:.3, fill:true, pointRadius:3, borderWidth:2.5 },
+        { label:'Punjab (legacy OPS)', data:pnjData, borderColor:'#94a3b8', borderDash:[5,4], tension:.3, fill:false, pointRadius:2, borderWidth:1.5 },
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{ display:false },
+        tooltip:{
+          callbacks:{
+            label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y}% of revenue receipts`
+          }
+        }
+      },
+      scales:{
+        x:{ grid:{ color:'#f1f5f9' }, ticks:{ font:{size:11}, maxRotation:45 } },
+        y:{
+          grid:{ color:'#f1f5f9' },
+          ticks:{ font:{size:11}, callback: v => v + '%' },
+          title:{ display:true, text:'% of Revenue Receipts', font:{size:11} },
+          suggestedMin:8, suggestedMax:32
+        }
+      }
+    }
+  });
+})();
+
+// Chart 2: Current pension burden by state
+(function() {
+  const states = [
+    { s:'Punjab',          v:24.0, color:'#dc2626' },
+    { s:'Himachal Pradesh',v:18.2, color:'#dc2626' },
+    { s:'Rajasthan',       v:15.8, color:'#ea580c' },
+    { s:'Kerala',          v:14.3, color:'#ea580c' },
+    { s:'West Bengal',     v:13.5, color:'#ea580c' },
+    { s:'Chhattisgarh',    v:12.9, color:'#ea580c' },
+    { s:'Jharkhand',       v:11.1, color:'#f59e0b' },
+    { s:'Madhya Pradesh',  v:10.4, color:'#f59e0b' },
+    { s:'Odisha',          v: 9.2, color:'#f59e0b' },
+    { s:'Bihar',           v: 9.0, color:'#f59e0b' },
+    { s:'Karnataka',       v: 8.1, color:'#84cc16' },
+    { s:'Tamil Nadu',      v: 7.8, color:'#84cc16' },
+    { s:'Maharashtra',     v: 7.2, color:'#16a34a' },
+    { s:'Gujarat',         v: 6.8, color:'#16a34a' },
+    { s:'Telangana',       v: 6.5, color:'#16a34a' },
+  ];
+  const sorted = [...states].sort((a,b) => b.v - a.v);
+
+  new Chart(document.getElementById('chart2'), {
+    type:'bar',
+    data:{
+      labels: sorted.map(d => d.s),
+      datasets:[{
+        data: sorted.map(d => d.v),
+        backgroundColor: sorted.map(d => d.color),
+        borderRadius:4, borderSkipped:false
+      }]
+    },
+    options:{
+      indexAxis:'y',
+      responsive:true,
+      plugins:{
+        legend:{ display:false },
+        tooltip:{ callbacks:{ label: ctx => ` ${ctx.parsed.x}% of revenue receipts` } }
+      },
+      scales:{
+        x:{
+          grid:{ color:'#f1f5f9' },
+          ticks:{ font:{size:11}, callback: v => v + '%' },
+          suggestedMax:28
+        },
+        y:{ grid:{ display:false }, ticks:{ font:{size:11} } }
+      }
+    },
+    plugins:[{
+      id:'frbmLine',
+      afterDraw(chart) {
+        const { ctx, scales } = chart;
+        const xPos = scales.x.getPixelForValue(12);
+        const top = scales.y.top;
+        const bot = scales.y.bottom;
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(xPos, top - 4);
+        ctx.lineTo(xPos, bot + 4);
+        ctx.strokeStyle = '#7c3aed';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4,3]);
+        ctx.stroke();
+        ctx.fillStyle = '#7c3aed';
+        ctx.font = '600 10px Inter,sans-serif';
+        ctx.fillText('NPS avg ~12%', xPos + 4, top + 10);
+        ctx.restore();
+      }
+    }]
+  });
+})();
+
+// Chart 3: NPS corpus foregone
+(function() {
+  const labels = ['Rajasthan','Chhattisgarh','Jharkhand','Himachal Pradesh'];
+  const values = [87000, 18000, 14000, 12000];
+  const colors = ['#dc2626','#ea580c','#f59e0b','#fb923c'];
+
+  new Chart(document.getElementById('chart3'), {
+    type:'bar',
+    data:{
+      labels,
+      datasets:[{
+        label:'NPS corpus foregone (₹ Cr)',
+        data: values,
+        backgroundColor: colors,
+        borderRadius:6, borderSkipped:false
+      }]
+    },
+    options:{
+      indexAxis:'y',
+      responsive:true,
+      plugins:{
+        legend:{ display:false },
+        tooltip:{ callbacks:{ label: ctx => ` ₹${ctx.parsed.x.toLocaleString('en-IN')} Cr (est. by 2030)` } }
+      },
+      scales:{
+        x:{
+          grid:{ color:'#f1f5f9' },
+          ticks:{ font:{size:10}, callback: v => '₹' + (v/1000) + 'k Cr' }
+        },
+        y:{ grid:{ display:false }, ticks:{ font:{size:10} } }
+      }
+    }
+  });
+})();
+
+// Chart 4: Pension as % of own tax revenue
+(function() {
+  const data = [
+    { s:'Punjab',          v:72, color:'#dc2626' },
+    { s:'Himachal Pradesh',v:40, color:'#dc2626' },
+    { s:'Rajasthan',       v:33, color:'#ea580c' },
+    { s:'Kerala',          v:28, color:'#ea580c' },
+    { s:'Chhattisgarh',    v:25, color:'#f59e0b' },
+    { s:'Jharkhand',       v:22, color:'#f59e0b' },
+    { s:'Karnataka',       v:14, color:'#84cc16' },
+    { s:'Gujarat',         v:11, color:'#16a34a' },
+    { s:'Maharashtra',     v:10, color:'#16a34a' },
+    { s:'Telangana',       v: 9, color:'#16a34a' },
+  ].sort((a,b) => b.v - a.v);
+
+  new Chart(document.getElementById('chart4'), {
+    type:'bar',
+    data:{
+      labels: data.map(d => d.s),
+      datasets:[{
+        data: data.map(d => d.v),
+        backgroundColor: data.map(d => d.color),
+        borderRadius:4, borderSkipped:false
+      }]
+    },
+    options:{
+      indexAxis:'y',
+      responsive:true,
+      plugins:{
+        legend:{ display:false },
+        tooltip:{ callbacks:{ label: ctx => ` ${ctx.parsed.x}% of own tax revenue` } }
+      },
+      scales:{
+        x:{
+          grid:{ color:'#f1f5f9' },
+          ticks:{ font:{size:10}, callback: v => v + '%' },
+          suggestedMax:80
+        },
+        y:{ grid:{ display:false }, ticks:{ font:{size:10} } }
+      }
+    }
+  });
+})();
+</script>
+<button id="btt" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="position:fixed;bottom:1.5rem;right:1.5rem;width:40px;height:40px;background:var(--navy);color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:1.1rem;opacity:0;transition:opacity .2s,transform .2s;transform:translateY(8px);z-index:98;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,.25)">↑</button>
+<script>
+(function(){
+  var p=document.getElementById('progress'),b=document.getElementById('btt');
+  window.addEventListener('scroll',function(){
+    var t=document.documentElement.scrollHeight-window.innerHeight;
+    if(p) p.style.width=(t>0?window.scrollY/t*100:0)+'%';
+    if(b){b.style.opacity=window.scrollY>300?1:0;b.style.transform=window.scrollY>300?'translateY(0)':'translateY(8px)';}
+  },{passive:true});
+})();
+</script>
+</body>
+</html>

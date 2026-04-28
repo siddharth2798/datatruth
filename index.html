@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DataTruth — Public money, made legible</title>
+  <meta name="description" content="DataTruth turns Indian government data — budgets, audit reports, parliamentary records — into stories every citizen can read and act on. 6 open-data studies." />
+  <meta property="og:title" content="DataTruth — Public money, made legible" />
+  <meta property="og:description" content="Where does India's public money go? 6 data journalism studies using open government data — from the March spending rush to hidden state debt." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:#0f172a; --blue:#1d4ed8; --red:#dc2626; --orange:#ea580c;
+      --green:#16a34a; --bg:#f8fafc; --card:#ffffff; --border:#e2e8f0;
+      --txt:#0f172a; --txt2:#475569; --txt3:#94a3b8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--txt); line-height:1.6; }
+
+    nav {
+      background:var(--navy); padding:1rem 2rem;
+      display:flex; align-items:center; justify-content:space-between;
+      position:sticky; top:0; z-index:100; gap:1rem;
+    }
+    .logo { font-family:'Playfair Display',serif; font-size:1.4rem; color:#fff; text-decoration:none; white-space:nowrap; }
+    .logo span { color:#ef4444; }
+    .nav-links { display:flex; gap:1.5rem; list-style:none; flex-wrap:wrap; }
+    .nav-links a { color:#94a3b8; text-decoration:none; font-size:.875rem; font-weight:500; transition:color .15s; }
+    .nav-links a:hover { color:#fff; }
+
+    .hero { background:var(--navy); color:#fff; padding:6rem 2rem 5rem; text-align:center; }
+    .hero-pill {
+      display:inline-block; background:rgba(239,68,68,.15); color:#f87171;
+      font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+      padding:.35rem .875rem; border-radius:100px; margin-bottom:1.5rem;
+    }
+    .hero h1 { font-family:'Playfair Display',serif; font-size:clamp(2.4rem,5vw,4rem); line-height:1.1; margin-bottom:1.25rem; }
+    .hero p { font-size:1.0625rem; color:#94a3b8; max-width:520px; margin:0 auto 2.5rem; }
+    .hero-btns { display:flex; gap:.875rem; justify-content:center; flex-wrap:wrap; }
+    .btn { padding:.7rem 1.4rem; border-radius:8px; font-weight:600; font-size:.875rem; cursor:pointer; text-decoration:none; border:none; transition:all .15s; display:inline-flex; align-items:center; gap:.4rem; }
+    .btn-red { background:#ef4444; color:#fff; }
+    .btn-red:hover { background:#dc2626; }
+    .btn-ghost { background:transparent; color:#fff; border:1.5px solid rgba(255,255,255,.3); }
+    .btn-ghost:hover { border-color:rgba(255,255,255,.6); }
+
+    .container { max-width:1080px; margin:0 auto; padding:0 2rem; }
+    .section { padding:5rem 0; }
+    .section + .section { border-top:1px solid var(--border); }
+    .section-tag { font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--red); margin-bottom:.75rem; }
+    .section-title { font-family:'Playfair Display',serif; font-size:clamp(1.75rem,3vw,2.4rem); line-height:1.2; margin-bottom:1rem; }
+    .section-body { font-size:.9375rem; color:var(--txt2); max-width:640px; line-height:1.75; margin-bottom:2.5rem; }
+
+    /* Studies grid */
+    .studies-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:1.5rem; }
+    .study-card {
+      display:block; text-decoration:none; color:inherit;
+      background:var(--card); border:1px solid var(--border); border-radius:16px;
+      padding:2rem; transition:all .2s; position:relative; overflow:hidden;
+    }
+    .study-card:hover { transform:translateY(-3px); box-shadow:0 12px 40px rgba(15,23,42,.1); border-color:#cbd5e1; }
+    .study-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+    .study-card.red::before { background:var(--red); }
+    .study-card.blue::before { background:var(--blue); }
+    .study-num { font-size:.68rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--txt3); margin-bottom:1rem; }
+    .study-name { font-family:'Playfair Display',serif; font-size:1.625rem; line-height:1.2; margin-bottom:.875rem; }
+    .study-desc { font-size:.9rem; color:var(--txt2); line-height:1.7; margin-bottom:1.25rem; }
+    .study-tags { display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:1.5rem; }
+    .study-tag-pill { font-size:.7rem; font-weight:600; padding:.25rem .625rem; border-radius:100px; background:#f1f5f9; color:var(--txt3); }
+    .study-finding { background:#fef2f2; border-left:3px solid var(--red); padding:.875rem 1rem; border-radius:0 6px 6px 0; margin-bottom:1.5rem; }
+    .study-finding.blue-find { background:#eff6ff; border-left-color:var(--blue); }
+    .finding-label { display:block; font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--red); margin-bottom:.3rem; }
+    .study-finding.blue-find .finding-label { color:var(--blue); }
+    .finding-val { font-size:.9rem; color:#7f1d1d; font-weight:600; }
+    .study-finding.blue-find .finding-val { color:#1e3a5f; }
+    .study-cta { display:flex; align-items:center; gap:.4rem; font-size:.875rem; font-weight:600; color:var(--blue); }
+    .study-card.red .study-cta { color:var(--red); }
+
+    /* About */
+    .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+    .about-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; }
+    .about-list { list-style:none; display:flex; flex-direction:column; gap:.875rem; }
+    .about-list li { display:flex; flex-direction:column; gap:.15rem; }
+    .about-list .a-name { font-size:.875rem; font-weight:600; color:var(--txt); }
+    .about-list .a-url { font-size:.8rem; color:var(--txt3); text-decoration:none; }
+    .about-list .a-url:hover { color:var(--blue); }
+    .about-list .a-desc { font-size:.8rem; color:var(--txt2); }
+
+    /* Coming soon badge */
+    .soon { display:inline-block; background:#f1f5f9; color:var(--txt3); font-size:.65rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:.2rem .5rem; border-radius:4px; margin-left:.5rem; vertical-align:middle; }
+
+    footer { background:var(--navy); color:#64748b; padding:3rem 2rem; text-align:center; }
+    .footer-logo { font-family:'Playfair Display',serif; font-size:1.25rem; color:#fff; margin-bottom:.75rem; }
+    .footer-logo span { color:#ef4444; }
+    footer p { font-size:.875rem; max-width:460px; margin:0 auto 1.5rem; line-height:1.65; }
+    .footer-links { display:flex; gap:1.5rem; justify-content:center; list-style:none; flex-wrap:wrap; }
+    .footer-links a { color:#64748b; text-decoration:none; font-size:.8125rem; transition:color .15s; }
+    .footer-links a:hover { color:#fff; }
+
+    @media (max-width:700px) {
+      .about-grid { grid-template-columns:1fr; }
+      nav { flex-wrap:wrap; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Data<span>Truth</span></a>
+  <ul class="nav-links">
+    <li><a href="march-rush.html">The March Rush</a></li>
+    <li><a href="mplads.html">MP's ₹5 Crore</a></li>
+    <li><a href="absent-mp.html">The Absent MP</a></li>
+    <li><a href="state-debt.html">State Debt</a></li>
+    <li><a href="scheme-maze.html">Scheme Maze</a></li>
+    <li><a href="pension-bomb.html">Pension Bomb</a></li>
+    <li><a href="credits.html">Credits</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div class="hero-pill">6 Studies · Open Data · India</div>
+  <h1>Public money.<br>Made legible.</h1>
+  <p>DataTruth takes government data that is technically public but practically invisible and turns it into stories every citizen can read, share, and act on.</p>
+  <div class="hero-btns">
+    <a href="#studies" class="btn btn-red">Browse Studies →</a>
+    <a href="#about" class="btn btn-ghost">About the Project</a>
+  </div>
+</section>
+
+<!-- STUDIES -->
+<section class="section" id="studies">
+  <div class="container">
+    <div class="section-tag">Studies</div>
+    <h2 class="section-title">What the data reveals</h2>
+    <p class="section-body">Each study takes one dataset, asks one accountability question, and presents the answer in full — with sources, methodology, and the context to understand what it means.</p>
+
+    <div class="studies-grid">
+
+      <a href="march-rush.html" class="study-card red">
+        <div class="study-num">01 · Budget Execution</div>
+        <h3 class="study-name">The March Rush</h3>
+        <p class="study-desc">Indian government ministries quietly hold back welfare budgets for eleven months, then spend 20–25% of the entire annual allocation in the last 30 days of March. Projects get sanctioned in panic, roads get built in the wrong season, and money gets wasted.</p>
+        <div class="study-tags">
+          <span class="study-tag-pill">11 years of data</span>
+          <span class="study-tag-pill">5 ministries</span>
+          <span class="study-tag-pill">FY 2015–16 to 2025–26</span>
+          <span class="study-tag-pill">CGA data</span>
+        </div>
+        <div class="study-finding">
+          <span class="finding-label">Key Finding</span>
+          <span class="finding-val">22–25% of annual welfare budgets spent in March alone, every single year</span>
+        </div>
+        <div class="study-cta">Explore Study →</div>
+      </a>
+
+      <a href="mplads.html" class="study-card blue">
+        <div class="study-num">02 · Parliamentary Accountability</div>
+        <h3 class="study-name">Your MP's ₹5 Crore</h3>
+        <p class="study-desc">Every MP receives ₹5 crore per year to spend on local infrastructure. Over a term, that is ₹25 crore per constituency — enough to build 50 classrooms or lay 100 km of rural roads. This study tracks what actually happens to that money.</p>
+        <div class="study-tags">
+          <span class="study-tag-pill">788 MPs</span>
+          <span class="study-tag-pill">State-wise breakdown</span>
+          <span class="study-tag-pill">FY 2023–24</span>
+          <span class="study-tag-pill">MoSPI data</span>
+        </div>
+        <div class="study-finding blue-find">
+          <span class="finding-label">Key Finding</span>
+          <span class="finding-val">₹528 crore lapsed unspent in FY 2023–24 — returned to Consolidated Fund</span>
+        </div>
+        <div class="study-cta">Explore Study →</div>
+      </a>
+
+      <a href="absent-mp.html" class="study-card red">
+        <div class="study-num">03 · Parliamentary Accountability</div>
+        <h3 class="study-name">The Absent MP</h3>
+        <p class="study-desc">Lok Sabha MPs cost taxpayers ₹2.8 crore over a five-year term in salary, allowances, and perks. This study cross-references 17th Lok Sabha attendance records with questions asked — and finds 62 MPs who showed up less than half the time.</p>
+        <div class="study-tags">
+          <span class="study-tag-pill">543 MPs</span>
+          <span class="study-tag-pill">330 sitting days</span>
+          <span class="study-tag-pill">17th Lok Sabha</span>
+          <span class="study-tag-pill">PRS data</span>
+        </div>
+        <div class="study-finding">
+          <span class="finding-label">Key Finding</span>
+          <span class="finding-val">62 MPs below 50% attendance; 38 MPs asked zero questions in 5 years</span>
+        </div>
+        <div class="study-cta">Explore Study →</div>
+      </a>
+
+      <a href="state-debt.html" class="study-card blue">
+        <div class="study-num">04 · State Fiscal Accountability</div>
+        <h3 class="study-name">The Debt Your State Is Hiding</h3>
+        <p class="study-desc">State governments publish official debt figures — but a parallel universe of off-budget borrowings through PSUs, SPVs, and state-owned utilities inflates real liabilities by 5–18 percentage points. Andhra Pradesh's true debt/GSDP may be 47%, not 29%.</p>
+        <div class="study-tags">
+          <span class="study-tag-pill">12 major states</span>
+          <span class="study-tag-pill">Off-budget debt</span>
+          <span class="study-tag-pill">FRBM targets</span>
+          <span class="study-tag-pill">RBI data</span>
+        </div>
+        <div class="study-finding blue-find">
+          <span class="finding-label">Key Finding</span>
+          <span class="finding-val">Punjab's pension + interest bill consumes 46% of revenue — nothing left for roads</span>
+        </div>
+        <div class="study-cta">Explore Study →</div>
+      </a>
+
+      <a href="scheme-maze.html" class="study-card red">
+        <div class="study-num">05 · Central Scheme Efficiency</div>
+        <h3 class="study-name">The Scheme Maze</h3>
+        <p class="study-desc">The Union government runs 133 centrally sponsored schemes — yet just 15 of them consume 91% of the total budget. The remaining 118 schemes share ₹30,000 crore, creating an administrative fog where accountability vanishes and states can't plan.</p>
+        <div class="study-tags">
+          <span class="study-tag-pill">133 schemes</span>
+          <span class="study-tag-pill">₹4.8 lakh crore</span>
+          <span class="study-tag-pill">Budget Statement 16</span>
+          <span class="study-tag-pill">NIPFP data</span>
+        </div>
+        <div class="study-finding">
+          <span class="finding-label">Key Finding</span>
+          <span class="finding-val">15 schemes get 91% of CSS budget; the other 118 share ₹30,000 Cr among them</span>
+        </div>
+        <div class="study-cta">Explore Study →</div>
+      </a>
+
+      <a href="pension-bomb.html" class="study-card blue">
+        <div class="study-num">06 · Long-term Fiscal Risk</div>
+        <h3 class="study-name">The Pension Timebomb</h3>
+        <p class="study-desc">Four states reverted from the contributory NPS to the old defined-benefit pension scheme between 2022 and 2023. By 2039–40, those states will spend ~28% of revenue receipts on pensions vs ~12% for NPS states — a slow-motion fiscal crisis already visible in budget documents.</p>
+        <div class="study-tags">
+          <span class="study-tag-pill">4 reverting states</span>
+          <span class="study-tag-pill">~15 lakh employees</span>
+          <span class="study-tag-pill">2040 projections</span>
+          <span class="study-tag-pill">RBI / NIPFP</span>
+        </div>
+        <div class="study-finding blue-find">
+          <span class="finding-label">Key Finding</span>
+          <span class="finding-val">Punjab already spends 24% of revenue on pensions — OPS states are 25 years behind</span>
+        </div>
+        <div class="study-cta">Explore Study →</div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="section" id="about">
+  <div class="container">
+    <div class="section-tag">About</div>
+    <h2 class="section-title">Why DataTruth?</h2>
+    <div class="about-grid">
+      <div>
+        <p class="section-body" style="margin-bottom:1rem;">
+          India has more open government data than most citizens realise. Budget accounts, MP expenditure records, scheme dashboards, audit reports — it is all technically public. But it lives in PDFs, scattered across hundreds of portals, in formats that require technical expertise to parse.
+        </p>
+        <p style="color:var(--txt2); font-size:.9375rem; line-height:1.75; margin-bottom:1rem;">
+          DataTruth exists to change that. Each study takes one dataset, asks one accountability question, and presents the answer so that any citizen can understand it, share it, and use it.
+        </p>
+        <p style="color:var(--txt2); font-size:.9375rem; line-height:1.75;">
+          All data used is from official Government of India sources. Where data is indicative (i.e., not yet fetched live), it is based on published CGA and MoSPI patterns and clearly labelled.
+        </p>
+      </div>
+      <div class="about-card">
+        <div style="font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--txt3); margin-bottom:1.25rem;">Primary Data Sources</div>
+        <ul class="about-list">
+          <li>
+            <span class="a-name">CGA — Controller General of Accounts</span>
+            <a href="https://cga.nic.in" target="_blank" class="a-url">cga.nic.in →</a>
+            <span class="a-desc">Monthly Union Government expenditure by ministry and scheme head</span>
+          </li>
+          <li>
+            <span class="a-name">MoSPI — MPLADS Portal</span>
+            <a href="https://mplads.mospi.gov.in" target="_blank" class="a-url">mplads.mospi.gov.in →</a>
+            <span class="a-desc">MP-wise project sanctioning, release, utilisation, and completion data</span>
+          </li>
+          <li>
+            <span class="a-name">CAG — Comptroller and Auditor General</span>
+            <a href="https://cag.gov.in" target="_blank" class="a-url">cag.gov.in →</a>
+            <span class="a-desc">Scheme audit findings and compliance reports</span>
+          </li>
+          <li>
+            <span class="a-name">data.gov.in — Open Government Data</span>
+            <a href="https://data.gov.in" target="_blank" class="a-url">data.gov.in →</a>
+            <span class="a-desc">Aggregated datasets from central and state ministries</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">Data<span>Truth</span></div>
+  <p>India's public money, made legible. Built entirely with open data from the Government of India.</p>
+  <p style="margin-bottom:1rem">
+    <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener license">
+      <img src="https://www.gnu.org/graphics/gplv3-80x15.png" alt="GNU GPL v3" style="vertical-align:middle;border-radius:2px;opacity:.7" />
+    </a>
+    &nbsp;<span style="font-size:.75rem">GNU GPL v3 — free to use, share &amp; modify; derivatives must also be open source</span>
+  </p>
+  <ul class="footer-links">
+    <li><a href="march-rush.html">The March Rush</a></li>
+    <li><a href="mplads.html">MP's ₹5 Crore</a></li>
+    <li><a href="absent-mp.html">The Absent MP</a></li>
+    <li><a href="state-debt.html">State Debt</a></li>
+    <li><a href="scheme-maze.html">Scheme Maze</a></li>
+    <li><a href="pension-bomb.html">Pension Bomb</a></li>
+    <li><a href="credits.html">Credits</a></li>
+  </ul>
+</footer>
+</body>
+</html>

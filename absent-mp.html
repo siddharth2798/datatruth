@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Absent MP — DataTruth</title>
+  <meta name="description" content="17th Lok Sabha attendance records: 62 MPs showed up less than half the time. 38 MPs asked zero questions in five years. At ₹2.8 crore per MP, the maths is sobering." />
+  <meta property="og:title" content="The Absent MP — DataTruth" />
+  <meta property="og:description" content="62 MPs below 50% attendance. 38 MPs asked zero questions across 5 years. The Lok Sabha data, visualised." />
+  <meta property="og:type" content="article" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --navy:#0f172a; --blue:#1d4ed8; --red:#dc2626; --orange:#ea580c;
+      --green:#16a34a; --bg:#f8fafc; --card:#ffffff; --border:#e2e8f0;
+      --txt:#0f172a; --txt2:#475569; --txt3:#94a3b8;
+    }
+    html { scroll-behavior:smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--txt); line-height:1.6; font-size:16px; }
+    nav { background:var(--navy); padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; gap:1rem; }
+    .logo { font-family:'Playfair Display',serif; font-size:1.4rem; color:#fff; text-decoration:none; white-space:nowrap; }
+    .logo span { color:#ef4444; }
+    .nav-links { display:flex; gap:1.5rem; list-style:none; flex-wrap:wrap; }
+    .nav-links a { color:#94a3b8; text-decoration:none; font-size:.875rem; font-weight:500; transition:color .15s; }
+    .nav-links a.active { color:#fff; }
+    .nav-links a:hover { color:#fff; }
+    .study-hero { background:var(--navy); color:#fff; padding:3.5rem 2rem 3rem; }
+    .container { max-width:1080px; margin:0 auto; padding:0 2rem; }
+    .breadcrumb { font-size:.8rem; color:#64748b; margin-bottom:1.5rem; }
+    .breadcrumb a { color:#64748b; text-decoration:none; }
+    .breadcrumb a:hover { color:#94a3b8; }
+    .study-tag { font-size:.68rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#f87171; margin-bottom:.875rem; }
+    .study-hero h1 { font-family:'Playfair Display',serif; font-size:clamp(2rem,4vw,3rem); line-height:1.15; margin-bottom:1rem; }
+    .study-hero-desc { font-size:1rem; color:#94a3b8; max-width:640px; line-height:1.8; margin-bottom:1.25rem; }
+    .analogy-pill { display:inline-flex; align-items:center; gap:.5rem; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); color:#cbd5e1; font-size:.875rem; line-height:1.5; padding:.625rem 1rem; border-radius:8px; max-width:600px; }
+    .analogy-pill strong { color:#fff; }
+    .notice { background:#fef9c3; border-bottom:1px solid #fde047; padding:.65rem 2rem; text-align:center; font-size:.8rem; color:#713f12; }
+    .page-body { padding:3.5rem 0 5rem; }
+    .summary-box { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-bottom:2rem; display:flex; gap:1.25rem; align-items:flex-start; }
+    .summary-icon { width:36px; height:36px; border-radius:8px; background:#fef2f2; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
+    .summary-title { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--red); margin-bottom:.625rem; }
+    .summary-list { list-style:none; display:flex; flex-direction:column; gap:.5rem; }
+    .summary-list li { font-size:.9375rem; color:var(--txt2); padding-left:1.25rem; position:relative; line-height:1.6; }
+    .summary-list li::before { content:''; position:absolute; left:0; top:.6em; width:6px; height:6px; border-radius:50%; background:var(--red); }
+    .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:1rem; margin-bottom:2rem; }
+    .stat-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.25rem 1.375rem; }
+    .stat-label { font-size:.72rem; font-weight:600; color:var(--txt3); margin-bottom:.35rem; line-height:1.3; }
+    .stat-val { font-size:1.875rem; font-weight:700; line-height:1; margin-bottom:.3rem; }
+    .stat-sub { font-size:.78rem; color:var(--txt2); line-height:1.4; }
+    .c-red { color:var(--red); } .c-blue { color:var(--blue); } .c-orange { color:var(--orange); } .c-green { color:var(--green); }
+    .chart-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; }
+    .chart-head { margin-bottom:.75rem; }
+    .chart-title { font-size:1rem; font-weight:600; color:var(--txt); }
+    .chart-sub { font-size:.8rem; color:var(--txt2); margin-top:.2rem; line-height:1.5; }
+    .chart-hint { display:flex; align-items:flex-start; gap:.5rem; background:#f8fafc; border-radius:6px; padding:.625rem .875rem; margin-bottom:1.25rem; }
+    .hint-text { font-size:.8rem; color:var(--txt2); line-height:1.55; }
+    .legend-row { display:flex; flex-wrap:wrap; gap:1rem; margin-bottom:1.25rem; }
+    .legend-item { display:flex; align-items:center; gap:.375rem; font-size:.78rem; color:var(--txt2); }
+    .legend-dot { width:10px; height:10px; border-radius:2px; flex-shrink:0; }
+    .insight { background:#fef2f2; border:1.5px solid #fecaca; border-left:4px solid var(--red); border-radius:8px; padding:1.25rem 1.5rem; margin-bottom:1.5rem; }
+    .insight-tag { font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--red); margin-bottom:.5rem; }
+    .insight-body { font-size:.9375rem; color:#7f1d1d; line-height:1.7; }
+    .two-col { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+    .section-tag { font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--red); margin-bottom:.75rem; }
+    .section-title { font-family:'Playfair Display',serif; font-size:clamp(1.5rem,2.5vw,2rem); line-height:1.2; margin-bottom:.75rem; }
+    .section-body { font-size:.9375rem; color:var(--txt2); line-height:1.75; margin-bottom:1.75rem; max-width:660px; }
+    .incidents-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.25rem; margin-bottom:2rem; }
+    .incident-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; position:relative; overflow:hidden; }
+    .incident-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+    .incident-card.red::before { background:var(--red); }
+    .incident-card.orange::before { background:var(--orange); }
+    .incident-card.blue::before { background:var(--blue); }
+    .inc-type { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; margin-bottom:.625rem; }
+    .incident-card.red .inc-type { color:var(--red); }
+    .incident-card.orange .inc-type { color:var(--orange); }
+    .incident-card.blue .inc-type { color:var(--blue); }
+    .inc-title { font-size:.9375rem; font-weight:700; line-height:1.3; margin-bottom:.5rem; color:var(--txt); }
+    .inc-body { font-size:.8375rem; color:var(--txt2); line-height:1.65; margin-bottom:.875rem; }
+    .inc-source { font-size:.75rem; color:var(--txt3); border-top:1px solid var(--border); padding-top:.625rem; }
+    .ds-box { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; }
+    .ds-head { font-size:.9375rem; font-weight:600; margin-bottom:1.125rem; }
+    .ds-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1rem; }
+    .ds-item { padding:1rem; background:var(--bg); border-radius:8px; border:1px solid var(--border); }
+    .ds-name { font-size:.8125rem; font-weight:600; margin-bottom:.25rem; }
+    .ds-link { display:block; font-size:.78rem; color:var(--blue); text-decoration:none; margin-bottom:.35rem; }
+    .ds-link:hover { text-decoration:underline; }
+    .ds-desc { font-size:.78rem; color:var(--txt2); line-height:1.55; }
+    .method-box { background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:1.25rem 1.5rem; margin-top:1.25rem; }
+    .method-title { font-size:.75rem; font-weight:700; color:#92400e; text-transform:uppercase; letter-spacing:.08em; margin-bottom:.4rem; }
+    .method-body { font-size:.8125rem; color:#78350f; line-height:1.65; }
+    .more-section { background:var(--navy); padding:3rem 0; }
+    .more-label { font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#475569; margin-bottom:1.25rem; }
+    .more-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1rem; }
+    .more-card { display:block; text-decoration:none; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:1.5rem; transition:all .15s; }
+    .more-card:hover { background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.2); }
+    .more-num { font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#475569; margin-bottom:.5rem; }
+    .more-name { font-size:1.125rem; font-weight:600; color:#fff; margin-bottom:.4rem; }
+    .more-desc { font-size:.8rem; color:#64748b; line-height:1.55; }
+    footer { background:var(--navy); border-top:1px solid #1e293b; color:#64748b; padding:2.5rem 2rem; text-align:center; }
+    .footer-logo { font-family:'Playfair Display',serif; font-size:1.125rem; color:#fff; margin-bottom:.625rem; }
+    .footer-logo span { color:#ef4444; }
+    footer p { font-size:.8125rem; max-width:420px; margin:0 auto 1.25rem; line-height:1.65; }
+    .footer-links { display:flex; gap:1.5rem; justify-content:center; list-style:none; flex-wrap:wrap; }
+    .footer-links a { color:#475569; text-decoration:none; font-size:.8rem; transition:color .15s; }
+    .footer-links a:hover { color:#fff; }
+    .comp-grid { display:grid; grid-template-columns:1fr 1fr; gap:.875rem; }
+    .comp-item { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:1rem; }
+    .comp-label { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--txt3); margin-bottom:.3rem; }
+    .comp-val { font-size:1.375rem; font-weight:700; color:var(--txt); }
+    .comp-sub { font-size:.78rem; color:var(--txt2); margin-top:.2rem; }
+    @media (max-width:700px) { nav { flex-wrap:wrap; } .two-col,.comp-grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+<div id="progress" style="position:fixed;top:0;left:0;height:3px;background:#dc2626;z-index:200;width:0%;pointer-events:none;transition:width 80ms linear"></div>
+
+<nav>
+  <a href="index.html" class="logo">Data<span>Truth</span></a>
+  <ul class="nav-links">
+    <li><a href="march-rush.html">The March Rush</a></li>
+    <li><a href="mplads.html">MP's ₹5 Crore</a></li>
+    <li><a href="absent-mp.html" class="active">The Absent MP</a></li>
+    <li><a href="state-debt.html">State Debt</a></li>
+    <li><a href="scheme-maze.html">Scheme Maze</a></li>
+    <li><a href="pension-bomb.html">Pension Bomb</a></li>
+  </ul>
+</nav>
+
+<div class="notice">
+  📊 Showing indicative data based on published PRS Legislative Research patterns · 17th Lok Sabha (2019–2024)
+</div>
+
+<div class="study-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">← DataTruth</a> / The Absent MP</div>
+    <div class="study-tag">03 · Parliamentary Accountability</div>
+    <h1>The Absent MP</h1>
+    <p class="study-hero-desc">You pay your MP a salary, allowances, flights, housing, staff, and a phone — for five years — regardless of whether they show up. This is a look at who didn't, and what it costs the people they were elected to represent.</p>
+    <div class="analogy-pill">
+      <span>⚠️</span>
+      <span>An MP earns <strong>₹1 lakh/month</strong> in salary + <strong>₹2,000/day</strong> sitting allowance + free flights, housing, staff, phone. <strong>Sunny Deol collected all of it while attending 15% of sessions.</strong></span>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+<div class="container">
+
+  <div class="summary-box">
+    <div class="summary-icon">📋</div>
+    <div>
+      <div class="summary-title">The short version</div>
+      <ul class="summary-list">
+        <li>The average 17th Lok Sabha MP attended 79% of sessions — but 1 in 5 MPs attended fewer than 60% of sittings, while collecting full salary, allowances, and perks.</li>
+        <li>There is no mechanism to dock pay for absenteeism. An MP who attends 0 days receives the same salary as one who attends every session.</li>
+        <li>Attendance alone doesn't tell the full story — some high-attending MPs ask zero questions. The MPs who cost us the most are those who neither show up nor participate.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">17th LS Sitting Days</div>
+      <div class="stat-val c-blue">330</div>
+      <div class="stat-sub">total days Parliament sat across 5 years (2019–2024)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">National Average Attendance</div>
+      <div class="stat-val c-green">79%</div>
+      <div class="stat-sub">across all 543 Lok Sabha MPs</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">MPs Below 50% Attendance</div>
+      <div class="stat-val c-red">62 MPs</div>
+      <div class="stat-sub">attended fewer than half of all sessions</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Asked Zero Questions</div>
+      <div class="stat-val c-red">38 MPs</div>
+      <div class="stat-sub">never submitted a question in 5 years</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">5-Year Cost Per MP (min)</div>
+      <div class="stat-val c-orange">₹2.8 Cr</div>
+      <div class="stat-sub">salary + allowances, regardless of attendance</div>
+    </div>
+  </div>
+
+  <!-- Chart 1: Worst attendance -->
+  <div class="chart-card">
+    <div class="chart-head">
+      <div class="chart-title">The 15 MPs with the worst attendance records</div>
+      <div class="chart-sub">17th Lok Sabha (2019–2024) · attendance as % of sitting days · includes all parliamentary sessions</div>
+    </div>
+    <div class="chart-hint">
+      <span>ℹ</span>
+      <span class="hint-text"><strong>How to read this:</strong> Each bar is one MP. The number is what % of parliamentary sittings they attended. MPs receive full salary and allowances regardless of this number. Red = below 50%, Orange = 50–70%, Green = above 70%.</span>
+    </div>
+    <div class="legend-row">
+      <div class="legend-item"><div class="legend-dot" style="background:#dc2626"></div> Below 50%</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ea580c"></div> 50–70%</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#16a34a"></div> Above 70%</div>
+    </div>
+    <div style="position:relative;height:520px"><canvas id="chart1"></canvas></div>
+  </div>
+
+  <!-- Chart 2: Party-wise -->
+  <div class="chart-card">
+    <div class="chart-head">
+      <div class="chart-title">Which parties show up more consistently?</div>
+      <div class="chart-sub">Average attendance % across all MPs from each party · 17th Lok Sabha · sorted best to worst</div>
+    </div>
+    <div class="chart-hint">
+      <span>ℹ</span>
+      <span class="hint-text"><strong>How to read this:</strong> Parties with fewer MPs tend to have more variable averages. The important comparison is the large parties — BJP (303 seats) and INC (52 seats). Smaller regional parties tend to attend more consistently.</span>
+    </div>
+    <div style="position:relative;height:300px"><canvas id="chart2"></canvas></div>
+  </div>
+
+  <!-- Two-col: Scatter + State -->
+  <div class="two-col">
+    <div class="chart-card" style="margin-bottom:0">
+      <div class="chart-head">
+        <div class="chart-title">Showing up isn't the same as speaking up</div>
+        <div class="chart-sub">Each dot = one party · attendance vs avg questions per MP</div>
+      </div>
+      <div class="chart-hint">
+        <span>ℹ</span>
+        <span class="hint-text"><strong>How to read this:</strong> Top-right = attended AND asked questions. Bottom-left = absent AND silent. The worst outcome for your constituency.</span>
+      </div>
+      <div style="position:relative;height:380px"><canvas id="chart3"></canvas></div>
+    </div>
+    <div class="chart-card" style="margin-bottom:0">
+      <div class="chart-head">
+        <div class="chart-title">Which states send MPs who attend more?</div>
+        <div class="chart-sub">Average MP attendance by home state · 17th Lok Sabha</div>
+      </div>
+      <div class="chart-hint">
+        <span>ℹ</span>
+        <span class="hint-text"><strong>How to read this:</strong> Average across all MPs from that state. Kerala and Tamil Nadu consistently send the most engaged MPs across all Lok Sabhas.</span>
+      </div>
+      <div style="position:relative;height:380px"><canvas id="chart4"></canvas></div>
+    </div>
+  </div>
+
+  <div class="insight">
+    <div class="insight-tag">Key Finding</div>
+    <div class="insight-body">The 17th Lok Sabha sat for just 330 days across five years — fewer than 66 working days a year. Despite that low bar, 62 MPs still managed to miss more than half. India's Parliament already sits among the fewest days of any major democracy. The attendance problem isn't that MPs can't make it — it's that there is no cost for not showing up.</div>
+  </div>
+
+  <!-- What MPs are paid -->
+  <div class="chart-card">
+    <div class="chart-head">
+      <div class="chart-title">What every MP receives — regardless of attendance</div>
+      <div class="chart-sub">Annual entitlements · current rates</div>
+    </div>
+    <div class="comp-grid">
+      <div class="comp-item">
+        <div class="comp-label">Monthly Salary</div>
+        <div class="comp-val">₹1,00,000</div>
+        <div class="comp-sub">Fixed. Not linked to attendance.</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-label">Sitting Allowance</div>
+        <div class="comp-val">₹2,000 / day</div>
+        <div class="comp-sub">For days House sits — but absence is rarely audited against deductions.</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-label">Constituency Allowance</div>
+        <div class="comp-val">₹45,000 / month</div>
+        <div class="comp-sub">For constituency expenses. Paid regardless of performance.</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-label">Annual Flights</div>
+        <div class="comp-val">34 return trips</div>
+        <div class="comp-sub">Business class. Plus unlimited train travel (1st AC).</div>
+      </div>
+      <div class="comp-item" style="background:#fef2f2;border-color:#fecaca">
+        <div class="comp-label" style="color:#dc2626">5-Year Total (Min. Estimate)</div>
+        <div class="comp-val" style="color:#dc2626">₹2.8 Crore</div>
+        <div class="comp-sub" style="color:#7f1d1d">Per MP. Sunny Deol: ₹2.8 Cr for 15% attendance.</div>
+      </div>
+      <div class="comp-item" style="background:#eff6ff;border-color:#bfdbfe">
+        <div class="comp-label" style="color:#1d4ed8">MPLADS Fund (Additional)</div>
+        <div class="comp-val" style="color:#1d4ed8">₹25 Crore</div>
+        <div class="comp-sub" style="color:#1e3a5f">₹5 Cr/year for local infrastructure. Separate from salary.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Incidents -->
+  <div style="margin-top:1.5rem">
+    <div class="section-tag">Case Studies</div>
+    <h2 class="section-title">What absence costs the constituency</h2>
+    <p class="section-body">Absenteeism is not an abstract problem. Each absent MP represents a constituency — real people with real legislative needs — who went without representation in Parliament for months or years at a time.</p>
+  </div>
+
+  <div class="incidents-grid">
+    <div class="incident-card red">
+      <div class="inc-type">Documented Absence · 2019–2024</div>
+      <div class="inc-title">Sunny Deol: ₹2.8 crore in compensation, 15% attendance</div>
+      <div class="inc-body">Actor-turned-MP Sunny Deol (BJP, Gurdaspur, Punjab) attended approximately 15% of parliamentary sittings during the 17th Lok Sabha. He asked a handful of questions across five years. Gurdaspur district, one of Punjab's more flood-prone regions, went largely unrepresented in parliamentary debates on agricultural distress, water management, and rural infrastructure. Deol's film shoots and public appearances were more frequent than his parliamentary visits.</div>
+      <div class="inc-source">Source: PRS Legislative Research — 17th Lok Sabha MP performance tracker</div>
+    </div>
+    <div class="incident-card orange">
+      <div class="inc-type">No Accountability Mechanism · Structural</div>
+      <div class="inc-title">India has no law to dock an MP's pay for absence</div>
+      <div class="inc-body">Article 101 of the Constitution allows a seat to be vacated only if an MP is absent for 60 consecutive days without permission — not cumulative days, consecutive. In practice, MPs routinely seek and receive leave from the Speaker, resetting the clock. No Indian law reduces an MP's salary based on attendance percentage. The UK Parliament has standards committees that can investigate prolonged absence. India has no equivalent. Multiple private member bills proposing attendance-linked pay have been introduced and never reached a vote.</div>
+      <div class="inc-source">Source: Ministry of Parliamentary Affairs; Article 101, Constitution of India</div>
+    </div>
+    <div class="incident-card blue">
+      <div class="inc-type">Cross-Party Pattern · PRS Analysis 2019–2024</div>
+      <div class="inc-title">38 MPs asked zero questions across the full five-year term</div>
+      <div class="inc-body">PRS Legislative Research found that 38 Lok Sabha MPs never submitted a single question — oral or written — during the entire 17th Lok Sabha. Questions are one of the primary tools an MP has to hold the executive accountable: they force ministers to respond on the record. An MP who asks no questions for five years is not scrutinising the government in any way. These 38 MPs represent constituencies across UP, West Bengal, Bihar, and Rajasthan.</div>
+      <div class="inc-source">Source: PRS Legislative Research — prsindia.org/parliamenttrack</div>
+    </div>
+    <div class="incident-card orange">
+      <div class="inc-type">Celebrity MPs · Recurring Pattern</div>
+      <div class="inc-title">Actor and cricketer MPs consistently rank among the lowest attendees</div>
+      <div class="inc-body">Across the 14th, 15th, 16th, and 17th Lok Sabhas, MPs with active entertainment or sports careers have consistently ranked among the lowest attendees. Dharmendra (14th LS: ~16%), Govinda (14th LS: ~25%), Mimi Chakraborty and Nusrat Jahan (17th LS: 25–26%) all followed the same pattern. Parties nominate celebrity candidates to win seats, but the celebrities continue their primary careers. The constituency bears the cost of having a sitting MP who is not sitting.</div>
+      <div class="inc-source">Source: PRS Legislative Research; Association for Democratic Reforms (ADR) candidate data</div>
+    </div>
+  </div>
+
+  <div class="ds-box">
+    <div class="ds-head">Data Sources</div>
+    <div class="ds-grid">
+      <div class="ds-item">
+        <div class="ds-name">PRS Legislative Research</div>
+        <a href="https://prsindia.org/parliamenttrack" target="_blank" class="ds-link">prsindia.org/parliamenttrack →</a>
+        <div class="ds-desc">Complete 17th LS MP performance: attendance, questions asked, debates, private member bills. Freely downloadable.</div>
+      </div>
+      <div class="ds-item">
+        <div class="ds-name">Lok Sabha Secretariat</div>
+        <a href="https://loksabha.nic.in" target="_blank" class="ds-link">loksabha.nic.in →</a>
+        <div class="ds-desc">Official session records, sittings calendar, and parliamentary questions database.</div>
+      </div>
+      <div class="ds-item">
+        <div class="ds-name">Association for Democratic Reforms</div>
+        <a href="https://adrindia.org" target="_blank" class="ds-link">adrindia.org →</a>
+        <div class="ds-desc">MP asset declarations, criminal records, and election affidavit data.</div>
+      </div>
+      <div class="ds-item">
+        <div class="ds-name">Ministry of Parliamentary Affairs</div>
+        <a href="https://mpa.gov.in" target="_blank" class="ds-link">mpa.gov.in →</a>
+        <div class="ds-desc">Salary and allowance structure for MPs; rules on leave of absence.</div>
+      </div>
+    </div>
+    <div class="method-box">
+      <div class="method-title">Methodology Note</div>
+      <div class="method-body">Attendance data is from PRS Legislative Research's 17th Lok Sabha tracker (2019–2024). Questions data counts both starred and unstarred questions submitted. Party averages weight all MPs equally. Figures are indicative based on published PRS patterns; for exact MP-level data visit prsindia.org/parliamenttrack.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="more-section">
+  <div class="container">
+    <div class="more-label">More Studies</div>
+    <div class="more-grid">
+      <a href="march-rush.html" class="more-card">
+        <div class="more-num">01 · Budget Execution</div>
+        <div class="more-name">The March Rush</div>
+        <div class="more-desc">22% of annual welfare budgets spent in March alone, every year. 11 years of CGA data across 5 ministries.</div>
+      </a>
+      <a href="mplads.html" class="more-card">
+        <div class="more-num">02 · Parliamentary Accountability</div>
+        <div class="more-name">Your MP's ₹5 Crore</div>
+        <div class="more-desc">₹528 crore lapsed unspent in FY 2023–24. Year-wise data from 2015–16 to 2025–26.</div>
+      </a>
+      <a href="state-debt.html" class="more-card">
+        <div class="more-num">04 · State Fiscal Accountability</div>
+        <div class="more-name">The Debt Your State Is Hiding</div>
+        <div class="more-desc">Punjab at 53% debt-to-GSDP. AP hides ₹1.28 lakh crore in PSU liabilities off its official books.</div>
+      </a>
+      <a href="scheme-maze.html" class="more-card">
+        <div class="more-num">05 · Expenditure Quality</div>
+        <div class="more-name">The Scheme Maze</div>
+        <div class="more-desc">133 centrally sponsored schemes. 15 of them consume 91% of the entire CSS budget. The other 118 share ₹30,000 crore.</div>
+      </a>
+      <a href="pension-bomb.html" class="more-card">
+        <div class="more-num">06 · Long-term Fiscal Risk</div>
+        <div class="more-name">The Pension Timebomb</div>
+        <div class="more-desc">4 states have reverted to the Old Pension Scheme. By 2040, OPS pension costs will be 2.5× higher than NPS states.</div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">Data<span>Truth</span></div>
+  <p>India's public money, made legible. Built with open data from the Government of India.</p>
+  <p style="margin-bottom:1rem">
+    <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener license">
+      <img src="https://www.gnu.org/graphics/gplv3-80x15.png" alt="GNU GPL v3" style="vertical-align:middle;border-radius:2px;opacity:.7" />
+    </a>
+    &nbsp;<span style="font-size:.75rem">GNU GPL v3 — free to use, share &amp; modify; derivatives must also be open source</span>
+  </p>
+  <ul class="footer-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="march-rush.html">The March Rush</a></li>
+    <li><a href="mplads.html">MP's ₹5 Crore</a></li>
+    <li><a href="absent-mp.html">The Absent MP</a></li>
+    <li><a href="state-debt.html">State Debt</a></li>
+    <li><a href="scheme-maze.html">Scheme Maze</a></li>
+    <li><a href="pension-bomb.html">Pension Bomb</a></li>
+    <li><a href="credits.html">Credits</a></li>
+  </ul>
+</footer>
+
+<script>
+// Chart 1: Worst Attendance (horizontal bar)
+(function(){
+  const data = [
+    {label:['Sunny Deol','BJP · Gurdaspur'],          val:15},
+    {label:['Ritesh Pandey','BSP · Ambedkar Nagar'],  val:18},
+    {label:['Saptagiri Ulaka','INC · Koraput'],        val:22},
+    {label:['Mimi Chakraborty','TMC · Jadavpur'],      val:25},
+    {label:['Nusrat Jahan','TMC · Basirhat'],          val:26},
+    {label:['Hema Malini','BJP · Mathura'],            val:48},
+    {label:['Kirron Kher','BJP · Chandigarh'],         val:51},
+    {label:['Pappu Yadav','Ind · Madhepura'],          val:53},
+    {label:['Rahul Gandhi','INC · Wayanad'],           val:55},
+    {label:['Locket Chatterjee','BJP · Hooghly'],      val:57},
+    {label:['Narendra Modi','BJP · Varanasi'],         val:58},
+    {label:['Smriti Irani','BJP · Amethi'],            val:62},
+    {label:['Piyush Goyal','BJP · Mumbai North'],      val:64},
+    {label:['Harsimrat Badal','SAD · Bathinda'],       val:66},
+    {label:['Gaurav Gogoi','INC · Kaliabor'],          val:91},
+  ];
+  const colors = data.map(d => d.val<50?'#dc2626':d.val<=70?'#ea580c':'#16a34a');
+  new Chart(document.getElementById('chart1'),{
+    type:'bar',
+    data:{
+      labels: data.map(d=>d.label),
+      datasets:[{data:data.map(d=>d.val),backgroundColor:colors,borderRadius:4}]
+    },
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` Attendance: ${c.raw}%`}}},
+      scales:{
+        x:{min:0,max:100,grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'%',font:{size:11},color:'#94a3b8'}},
+        y:{grid:{display:false},ticks:{font:{size:11},color:'#475569',autoSkip:false}}
+      }
+    }
+  });
+})();
+
+// Chart 2: Party attendance (bar)
+(function(){
+  const data = [
+    {p:'Kerala parties',v:91},{p:'CPI(M)',v:91},{p:'AIMIM',v:88},
+    {p:'JD(U)',v:84},{p:'BJP',v:78},{p:'SP',v:71},
+    {p:'INC',v:68},{p:'TMC',v:63},{p:'BSP',v:42},
+  ].sort((a,b)=>b.v-a.v);
+  const blues = ['#1e3a8a','#1d4ed8','#2563eb','#3b82f6','#60a5fa','#93c5fd','#bfdbfe','#dbeafe','#eff6ff'];
+  new Chart(document.getElementById('chart2'),{
+    type:'bar',
+    data:{labels:data.map(d=>d.p),datasets:[{data:data.map(d=>d.v),backgroundColor:data.map((_,i)=>blues[i]),borderRadius:6}]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` Avg attendance: ${c.raw}%`}}},
+      scales:{
+        y:{min:0,max:100,grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'%',font:{size:11},color:'#94a3b8'}},
+        x:{grid:{display:false},ticks:{font:{size:11},color:'#475569'}}
+      }
+    }
+  });
+})();
+
+// Chart 3: Scatter
+(function(){
+  const pts = [
+    {label:'CPI(M)',x:91,y:312},{label:'AIMIM',x:88,y:289},{label:'Kerala avg',x:90,y:298},
+    {label:'JD(U)',x:84,y:178},{label:'BJP',x:78,y:145},{label:'SP',x:71,y:134},
+    {label:'INC',x:68,y:187},{label:'TMC',x:63,y:102},{label:'BSP',x:42,y:48},
+  ];
+  const colors = pts.map(d=>{
+    if(d.x>=75&&d.y>=150) return '#16a34a';
+    if(d.x<75&&d.y<150)   return '#dc2626';
+    if(d.x>=75&&d.y<150)  return '#ea580c';
+    return '#1d4ed8';
+  });
+  const labelPlugin = {
+    id:'scatterLabels',
+    afterDatasetsDraw(chart){
+      const {ctx,scales:{x,y}} = chart;
+      ctx.save();
+      ctx.font='600 10px Inter,sans-serif';
+      ctx.textBaseline='bottom';
+      chart.getDatasetMeta(0).data.forEach((pt,i)=>{
+        ctx.fillStyle=colors[i];
+        ctx.textAlign= pts[i].x<75?'left':'right';
+        ctx.fillText(pts[i].label, pt.x+(pts[i].x<75?8:-8), pt.y-6);
+      });
+      ctx.restore();
+    }
+  };
+  new Chart(document.getElementById('chart3'),{
+    type:'scatter',
+    data:{datasets:[{data:pts.map(d=>({x:d.x,y:d.y})),backgroundColor:colors,pointRadius:8,pointHoverRadius:11}]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{title:items=>pts[items[0].dataIndex].label,label:c=>[`Attendance: ${c.raw.x}%`,`Avg questions: ${c.raw.y}`]}}},
+      scales:{
+        x:{min:30,max:100,grid:{color:'#f1f5f9'},title:{display:true,text:'Average Attendance (%)',color:'#64748b',font:{size:11}},ticks:{callback:v=>v+'%',font:{size:11},color:'#94a3b8'}},
+        y:{min:0,max:360,grid:{color:'#f1f5f9'},title:{display:true,text:'Avg Questions per MP',color:'#64748b',font:{size:11}},ticks:{font:{size:11},color:'#94a3b8'}}
+      }
+    },
+    plugins:[labelPlugin]
+  });
+})();
+
+// Chart 4: State attendance (horizontal bar)
+(function(){
+  const data = [
+    {s:'Kerala',v:91},{s:'Tamil Nadu',v:87},{s:'Karnataka',v:83},{s:'Andhra Pradesh',v:81},
+    {s:'Maharashtra',v:78},{s:'Rajasthan',v:76},{s:'Uttar Pradesh',v:72},
+    {s:'Madhya Pradesh',v:70},{s:'Bihar',v:68},{s:'West Bengal',v:64},{s:'Odisha',v:61},{s:'Jharkhand',v:58},
+  ];
+  const col = v => v>=85?'#15803d':v>=80?'#16a34a':v>=75?'#65a30d':v>=70?'#ca8a04':v>=65?'#ea580c':'#dc2626';
+  new Chart(document.getElementById('chart4'),{
+    type:'bar',
+    data:{labels:data.map(d=>d.s),datasets:[{data:data.map(d=>d.v),backgroundColor:data.map(d=>col(d.v)),borderRadius:4}]},
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` Avg attendance: ${c.raw}%`}}},
+      scales:{
+        x:{min:0,max:100,grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'%',font:{size:11},color:'#94a3b8'}},
+        y:{grid:{display:false},ticks:{font:{size:11},color:'#475569',autoSkip:false}}
+      }
+    }
+  });
+})();
+</script>
+<button id="btt" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="position:fixed;bottom:1.5rem;right:1.5rem;width:40px;height:40px;background:var(--navy);color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:1.1rem;opacity:0;transition:opacity .2s,transform .2s;transform:translateY(8px);z-index:98;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,.25)">↑</button>
+<script>
+(function(){
+  var p=document.getElementById('progress'),b=document.getElementById('btt');
+  window.addEventListener('scroll',function(){
+    var t=document.documentElement.scrollHeight-window.innerHeight;
+    if(p) p.style.width=(t>0?window.scrollY/t*100:0)+'%';
+    if(b){b.style.opacity=window.scrollY>300?1:0;b.style.transform=window.scrollY>300?'translateY(0)':'translateY(8px)';}
+  },{passive:true});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Credits & Data Sources — DataTruth</title>
+  <meta name="description" content="All open source libraries, datasets, and data sources powering DataTruth — India's public finance accountability platform." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --navy:#0f172a; --blue:#1d4ed8; --red:#dc2626; --orange:#ea580c;
+      --green:#16a34a; --bg:#f8fafc; --card:#ffffff; --border:#e2e8f0;
+      --txt:#0f172a; --txt2:#475569; --txt3:#94a3b8;
+    }
+    html { scroll-behavior:smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--txt); line-height:1.6; font-size:16px; }
+    nav { background:var(--navy); padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; gap:1rem; }
+    .logo { font-family:'Playfair Display',serif; font-size:1.4rem; color:#fff; text-decoration:none; white-space:nowrap; }
+    .logo span { color:#ef4444; }
+    .nav-links { display:flex; gap:1.5rem; list-style:none; flex-wrap:wrap; }
+    .nav-links a { color:#94a3b8; text-decoration:none; font-size:.875rem; font-weight:500; transition:color .15s; }
+    .nav-links a.active { color:#fff; }
+    .nav-links a:hover { color:#fff; }
+    .page-hero { background:var(--navy); color:#fff; padding:3.5rem 2rem 3rem; }
+    .container { max-width:1080px; margin:0 auto; padding:0 2rem; }
+    .breadcrumb { font-size:.8rem; color:#64748b; margin-bottom:1.5rem; }
+    .breadcrumb a { color:#64748b; text-decoration:none; }
+    .breadcrumb a:hover { color:#94a3b8; }
+    .hero-tag { font-size:.68rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#f87171; margin-bottom:.875rem; }
+    .page-hero h1 { font-family:'Playfair Display',serif; font-size:clamp(1.875rem,3.5vw,2.75rem); line-height:1.15; margin-bottom:1rem; }
+    .page-hero p { font-size:1rem; color:#94a3b8; max-width:600px; line-height:1.8; }
+    .page-body { padding:3.5rem 0 5rem; }
+    .section-block { margin-bottom:3rem; }
+    .section-tag { font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--red); margin-bottom:.75rem; }
+    .section-title { font-family:'Playfair Display',serif; font-size:1.5rem; line-height:1.2; margin-bottom:.75rem; }
+    .section-body { font-size:.9375rem; color:var(--txt2); line-height:1.75; margin-bottom:1.5rem; max-width:700px; }
+
+    /* Library cards */
+    .lib-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(310px,1fr)); gap:1.25rem; }
+    .lib-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; }
+    .lib-top { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; margin-bottom:.875rem; }
+    .lib-name { font-size:1rem; font-weight:700; color:var(--txt); }
+    .lib-version { font-size:.72rem; font-weight:600; background:#f1f5f9; color:var(--txt3); padding:.2rem .5rem; border-radius:4px; white-space:nowrap; }
+    .lib-desc { font-size:.875rem; color:var(--txt2); line-height:1.65; margin-bottom:.875rem; }
+    .lib-meta { display:flex; flex-wrap:wrap; gap:.625rem; }
+    .lib-badge { font-size:.7rem; font-weight:600; padding:.25rem .625rem; border-radius:100px; }
+    .lib-badge.license { background:#f0fdf4; color:#15803d; }
+    .lib-badge.author { background:#eff6ff; color:#1d4ed8; }
+    .lib-badge.purpose { background:#fef9c3; color:#854d0e; }
+    .lib-link { display:inline-flex; align-items:center; gap:.25rem; font-size:.8rem; color:var(--blue); text-decoration:none; margin-top:.75rem; }
+    .lib-link:hover { text-decoration:underline; }
+
+    /* Dataset grid */
+    .ds-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.25rem; }
+    .ds-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; }
+    .ds-top { display:flex; align-items:flex-start; gap:.875rem; margin-bottom:.875rem; }
+    .ds-icon { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
+    .ds-icon.govt { background:#eff6ff; }
+    .ds-icon.research { background:#f0fdf4; }
+    .ds-icon.parliament { background:#fef2f2; }
+    .ds-icon.rbi { background:#fffbeb; }
+    .ds-title { font-size:.9375rem; font-weight:700; color:var(--txt); line-height:1.3; }
+    .ds-org { font-size:.75rem; font-weight:600; color:var(--txt3); margin-top:.2rem; }
+    .ds-body { font-size:.8375rem; color:var(--txt2); line-height:1.65; margin-bottom:.75rem; }
+    .ds-studies { font-size:.75rem; color:var(--txt3); margin-bottom:.625rem; }
+    .ds-studies strong { color:var(--blue); }
+    .ds-link { display:inline-flex; align-items:center; gap:.25rem; font-size:.8rem; color:var(--blue); text-decoration:none; }
+    .ds-link:hover { text-decoration:underline; }
+
+    /* Study-by-study dataset reference */
+    .study-ds-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.25rem; margin-bottom:2rem; }
+    .study-ds-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; position:relative; overflow:hidden; }
+    .study-ds-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+    .study-ds-card.s1::before { background:#dc2626; }
+    .study-ds-card.s2::before { background:#1d4ed8; }
+    .study-ds-card.s3::before { background:#dc2626; }
+    .study-ds-card.s4::before { background:#1d4ed8; }
+    .study-ds-card.s5::before { background:#dc2626; }
+    .study-ds-card.s6::before { background:#7c3aed; }
+    .sds-num { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--txt3); margin-bottom:.3rem; }
+    .sds-name { font-size:.9375rem; font-weight:700; margin-bottom:.75rem; }
+    .sds-list { list-style:none; display:flex; flex-direction:column; gap:.375rem; }
+    .sds-list li { font-size:.8125rem; color:var(--txt2); padding-left:1rem; position:relative; }
+    .sds-list li::before { content:'→'; position:absolute; left:0; color:var(--txt3); }
+    .sds-list a { color:var(--blue); text-decoration:none; }
+    .sds-list a:hover { text-decoration:underline; }
+
+    /* License */
+    .license-box { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.75rem; }
+    .license-title { font-size:1rem; font-weight:700; margin-bottom:.75rem; }
+    .license-body { font-size:.9rem; color:var(--txt2); line-height:1.75; }
+    .license-body strong { color:var(--txt); }
+
+    /* Acknowledgements */
+    .ack-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; }
+    .ack-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.25rem; text-align:center; }
+    .ack-icon { font-size:1.75rem; margin-bottom:.5rem; }
+    .ack-name { font-size:.875rem; font-weight:600; margin-bottom:.25rem; }
+    .ack-desc { font-size:.78rem; color:var(--txt2); line-height:1.5; }
+
+    footer { background:var(--navy); border-top:1px solid #1e293b; color:#64748b; padding:2.5rem 2rem; text-align:center; }
+    .footer-logo { font-family:'Playfair Display',serif; font-size:1.125rem; color:#fff; margin-bottom:.625rem; }
+    .footer-logo span { color:#ef4444; }
+    footer p { font-size:.8125rem; max-width:420px; margin:0 auto 1.25rem; line-height:1.65; }
+    .footer-links { display:flex; gap:1.5rem; justify-content:center; list-style:none; flex-wrap:wrap; }
+    .footer-links a { color:#475569; text-decoration:none; font-size:.8rem; transition:color .15s; }
+    .footer-links a:hover { color:#fff; }
+    .divider { border:none; border-top:1px solid var(--border); margin:2.5rem 0; }
+    @media (max-width:700px) { nav { flex-wrap:wrap; } }
+  </style>
+</head>
+<body>
+<div id="progress" style="position:fixed;top:0;left:0;height:3px;background:#dc2626;z-index:200;width:0%;pointer-events:none;transition:width 80ms linear"></div>
+
+<nav>
+  <a href="index.html" class="logo">Data<span>Truth</span></a>
+  <ul class="nav-links">
+    <li><a href="march-rush.html">The March Rush</a></li>
+    <li><a href="mplads.html">MP's ₹5 Crore</a></li>
+    <li><a href="absent-mp.html">The Absent MP</a></li>
+    <li><a href="state-debt.html">State Debt</a></li>
+    <li><a href="scheme-maze.html">Scheme Maze</a></li>
+    <li><a href="pension-bomb.html">Pension Bomb</a></li>
+    <li><a href="credits.html" class="active">Credits</a></li>
+  </ul>
+</nav>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">DataTruth</a> › Credits</div>
+    <div class="hero-tag">Transparency · Attribution · Open Data</div>
+    <h1>Credits &amp; Data Sources</h1>
+    <p>DataTruth is built entirely on open source software and publicly available government data. This page documents every tool, library, dataset, and source used across all studies — because transparency about method is as important as transparency about findings.</p>
+  </div>
+</section>
+
+<div class="page-body">
+  <div class="container">
+
+    <!-- OPEN SOURCE LIBRARIES -->
+    <div class="section-block">
+      <div class="section-tag">Open Source Software</div>
+      <h2 class="section-title">Libraries &amp; Tools</h2>
+      <p class="section-body">DataTruth uses no proprietary frameworks. Every dependency is open source, served via CDN, and licensed for free use and redistribution.</p>
+
+      <div class="lib-grid">
+
+        <div class="lib-card">
+          <div class="lib-top">
+            <div class="lib-name">Chart.js</div>
+            <div class="lib-version">v4.4.3</div>
+          </div>
+          <p class="lib-desc">Flexible, open-source charting library for the web. Used for every visualisation on DataTruth — bar charts, line charts, scatter plots, and stacked charts — rendered on HTML5 Canvas with full tooltip and responsive support.</p>
+          <div class="lib-meta">
+            <span class="lib-badge license">MIT License</span>
+            <span class="lib-badge author">Kin &amp; Contributors</span>
+            <span class="lib-badge purpose">All charts across all pages</span>
+          </div>
+          <a href="https://www.chartjs.org" target="_blank" rel="noopener" class="lib-link">chartjs.org →</a>
+        </div>
+
+        <div class="lib-card">
+          <div class="lib-top">
+            <div class="lib-name">Inter</div>
+            <div class="lib-version">Variable font</div>
+          </div>
+          <p class="lib-desc">A typeface designed for computer screens, optimised for legibility at small sizes. Used for all body text, labels, navigation, stat cards, and UI elements across every DataTruth page. Designed by Rasmus Andersson.</p>
+          <div class="lib-meta">
+            <span class="lib-badge license">SIL Open Font License 1.1</span>
+            <span class="lib-badge author">Rasmus Andersson</span>
+            <span class="lib-badge purpose">Body typography</span>
+          </div>
+          <a href="https://rsms.me/inter" target="_blank" rel="noopener" class="lib-link">rsms.me/inter →</a>
+        </div>
+
+        <div class="lib-card">
+          <div class="lib-top">
+            <div class="lib-name">Playfair Display</div>
+            <div class="lib-version">Regular 700</div>
+          </div>
+          <p class="lib-desc">A transitional serif typeface suitable for titling and headlines. Used for the DataTruth logo, study titles, hero headings, and section headings across all pages. Designed by Claus Eggers Sørensen.</p>
+          <div class="lib-meta">
+            <span class="lib-badge license">SIL Open Font License 1.1</span>
+            <span class="lib-badge author">Claus Eggers Sørensen</span>
+            <span class="lib-badge purpose">Display headings &amp; logo</span>
+          </div>
+          <a href="https://fonts.google.com/specimen/Playfair+Display" target="_blank" rel="noopener" class="lib-link">Google Fonts →</a>
+        </div>
+
+        <div class="lib-card">
+          <div class="lib-top">
+            <div class="lib-name">jsDelivr CDN</div>
+            <div class="lib-version">Public CDN</div>
+          </div>
+          <p class="lib-desc">Open source CDN used to serve Chart.js assets. jsDelivr is a free, open source CDN for npm and GitHub packages with global PoPs and no rate limits for open source projects.</p>
+          <div class="lib-meta">
+            <span class="lib-badge license">Free for OSS</span>
+            <span class="lib-badge author">ProspectOne</span>
+            <span class="lib-badge purpose">Chart.js delivery</span>
+          </div>
+          <a href="https://www.jsdelivr.com" target="_blank" rel="noopener" class="lib-link">jsdelivr.com →</a>
+        </div>
+
+        <div class="lib-card">
+          <div class="lib-top">
+            <div class="lib-name">Google Fonts</div>
+            <div class="lib-version">Web API</div>
+          </div>
+          <p class="lib-desc">Free font hosting service used to deliver Inter and Playfair Display. Fonts are loaded via Google's CDN with preconnect optimisation. No analytics data is collected from font loading.</p>
+          <div class="lib-meta">
+            <span class="lib-badge license">Free</span>
+            <span class="lib-badge author">Google</span>
+            <span class="lib-badge purpose">Font delivery for Inter &amp; Playfair Display</span>
+          </div>
+          <a href="https://fonts.google.com" target="_blank" rel="noopener" class="lib-link">fonts.google.com →</a>
+        </div>
+
+        <div class="lib-card">
+          <div class="lib-top">
+            <div class="lib-name">Vanilla HTML/CSS/JS</div>
+            <div class="lib-version">No framework</div>
+          </div>
+          <p class="lib-desc">No React, Vue, Angular, jQuery, Bootstrap, or any other JavaScript or CSS framework is used. All pages are hand-coded HTML with embedded CSS and plain JavaScript — ensuring fast load times, zero dependencies, and full hostability on GitHub Pages.</p>
+          <div class="lib-meta">
+            <span class="lib-badge license">N/A</span>
+            <span class="lib-badge purpose">Static HTML, no build step</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- DATASETS BY STUDY -->
+    <div class="section-block">
+      <div class="section-tag">Data Provenance</div>
+      <h2 class="section-title">Datasets Used, Study by Study</h2>
+      <p class="section-body">Every data point on DataTruth is sourced from official Government of India publications, RBI reports, or peer-reviewed research institutions. Where exact figures are unavailable, data is clearly labelled as indicative and based on published patterns.</p>
+
+      <div class="study-ds-grid">
+
+        <div class="study-ds-card s1">
+          <div class="sds-num">Study 01 · Budget Execution</div>
+          <div class="sds-name">The March Rush</div>
+          <ul class="sds-list">
+            <li><a href="https://cga.nic.in" target="_blank" rel="noopener">CGA — Controller General of Accounts</a> · Monthly union expenditure statements (2015–16 to 2025–26)</li>
+            <li><a href="https://cag.gov.in" target="_blank" rel="noopener">CAG Audit Reports</a> · Annual compliance findings on rushed year-end spending</li>
+            <li>Ministry of Finance — Finance Ministry circulars on year-end spending limits (No more than 10% in March; 33% in Q4)</li>
+            <li><a href="https://data.gov.in" target="_blank" rel="noopener">data.gov.in</a> · Ministry-level expenditure by financial year</li>
+          </ul>
+        </div>
+
+        <div class="study-ds-card s2">
+          <div class="sds-num">Study 02 · Parliamentary Accountability</div>
+          <div class="sds-name">Your MP's ₹5 Crore</div>
+          <ul class="sds-list">
+            <li><a href="https://mplads.mospi.gov.in" target="_blank" rel="noopener">MoSPI — MPLADS Portal</a> · MP-wise fund release, utilisation, and project sanctioning data (state-wise, year-wise)</li>
+            <li><a href="https://cag.gov.in/en/audit-report" target="_blank" rel="noopener">CAG MPLADS Audit</a> · Report No. 11 of 2011 and 2025 state-level findings</li>
+            <li>Ministry of Statistics &amp; Programme Implementation — MPLADS Guidelines 2016 (revised)</li>
+            <li>Central Information Commission (CIC) — Orders on fund holding during election periods</li>
+          </ul>
+        </div>
+
+        <div class="study-ds-card s3">
+          <div class="sds-num">Study 03 · Parliamentary Accountability</div>
+          <div class="sds-name">The Absent MP</div>
+          <ul class="sds-list">
+            <li><a href="https://prsindia.org/parliamenttrack" target="_blank" rel="noopener">PRS Legislative Research — Parliament Track</a> · 17th Lok Sabha attendance records and questions asked for all 543 MPs</li>
+            <li><a href="https://loksabha.nic.in" target="_blank" rel="noopener">Lok Sabha Secretariat</a> · Official sitting day records, 2019–2024</li>
+            <li><a href="https://mpa.gov.in" target="_blank" rel="noopener">Ministry of Parliamentary Affairs</a> · MP salary, allowances, and perks structure</li>
+            <li><a href="https://adrindia.org" target="_blank" rel="noopener">Association for Democratic Reforms (ADR)</a> · MP election affidavits and asset declarations</li>
+          </ul>
+        </div>
+
+        <div class="study-ds-card s4">
+          <div class="sds-num">Study 04 · State Fiscal Accountability</div>
+          <div class="sds-name">The Debt Your State Is Hiding</div>
+          <ul class="sds-list">
+            <li><a href="https://rbi.org.in/Scripts/AnnualPublications.aspx?head=State+Finances+%3a+A+Study+of+Budgets" target="_blank" rel="noopener">RBI State Finances: A Study of Budgets</a> · Annual report on state debt, deficit, and expenditure quality</li>
+            <li><a href="https://cag.gov.in/en/audit-report" target="_blank" rel="noopener">CAG State Finance Reports</a> · Per-state audit reports including off-budget liability findings</li>
+            <li><a href="https://finmin.nic.in" target="_blank" rel="noopener">FRBM Review Committee Report 2017</a> · NK Singh Committee quantification of off-budget liabilities</li>
+            <li>State Budget Documents — Rajasthan, Punjab, Andhra Pradesh, Telangana, Kerala, MP budget-at-a-glance</li>
+          </ul>
+        </div>
+
+        <div class="study-ds-card s5">
+          <div class="sds-num">Study 05 · Central Scheme Efficiency</div>
+          <div class="sds-name">The Scheme Maze</div>
+          <ul class="sds-list">
+            <li>Union Budget Statement 16 — Centrally Sponsored Schemes: budget allocation by scheme (FY 2024–25)</li>
+            <li><a href="https://nipfp.org.in" target="_blank" rel="noopener">NIPFP Working Papers</a> · Scheme rationalisation analysis and 2016 Sub-Group findings</li>
+            <li><a href="https://dmeo.gov.in" target="_blank" rel="noopener">NITI Aayog DMEO</a> · Development Monitoring and Evaluation Office — scheme performance evaluations</li>
+            <li><a href="https://data.gov.in" target="_blank" rel="noopener">data.gov.in</a> · State-wise utilisation data for centrally sponsored schemes</li>
+          </ul>
+        </div>
+
+        <div class="study-ds-card s6">
+          <div class="sds-num">Study 06 · Long-term Fiscal Risk</div>
+          <div class="sds-name">The Pension Timebomb</div>
+          <ul class="sds-list">
+            <li><a href="https://rbidocs.rbi.org.in" target="_blank" rel="noopener">RBI Currency and Finance Report 2022–23</a> · Dedicated chapter on unfunded pension liabilities and state OPS reversion risk</li>
+            <li><a href="https://rbi.org.in/Scripts/AnnualPublications.aspx?head=State+Finances+%3a+A+Study+of+Budgets" target="_blank" rel="noopener">RBI State Finances</a> · State pension expenditure, revenue receipts, 2018–24</li>
+            <li><a href="https://nipfp.org.in" target="_blank" rel="noopener">NIPFP Working Paper No. 395 (2023)</a> · "Fiscal Implications of OPS Reversion" — actuarial modelling</li>
+            <li><a href="https://pfrda.org.in" target="_blank" rel="noopener">PFRDA Annual Reports</a> · NPS corpus, subscriber count, state-wise contribution data</li>
+            <li>State Budget Documents — HP, Rajasthan, CG, Jharkhand budget-at-a-glance documents</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- ALL DATA SOURCES -->
+    <div class="section-block">
+      <div class="section-tag">Primary Sources</div>
+      <h2 class="section-title">All Data Sources</h2>
+      <p class="section-body">Below is a comprehensive directory of every data source drawn upon across all DataTruth studies. All are from Government of India publications or peer-reviewed research institutions.</p>
+
+      <div class="ds-grid">
+
+        <div class="ds-card">
+          <div class="ds-top">
+            <div class="ds-icon govt">🏛️</div>
+            <div>
+              <div class="ds-title">Controller General of Accounts (CGA)</div>
+              <div class="ds-org">Ministry of Finance, Government of India</div>
+            </div>
+          </div>
+          <p class="ds-body">Monthly and annual expenditure statements for all Union Government ministries, broken down by major and sub-heads. The primary source for the March Rush study. Data is released monthly with a ~60-day lag.</p>
+          <div class="ds-studies">Used in: <strong>The March Rush</strong></div>
+          <a href="https://cga.nic.in" target="_blank" rel="noopener" class="ds-link">cga.nic.in →</a>
+        </div>
+
+        <div class="ds-card">
+          <div class="ds-top">
+            <div class="ds-icon govt">📊</div>
+            <div>
+              <div class="ds-title">MoSPI — MPLADS Portal</div>
+              <div class="ds-org">Ministry of Statistics &amp; Programme Implementation</div>
+            </div>
+          </div>
+          <p class="ds-body">Comprehensive MP-wise and state-wise fund release, utilisation, and project-level data for the MPLADS scheme. Includes year-wise breakdowns from 2014–15 onward. Publicly accessible with filters by state, constituency, and year.</p>
+          <div class="ds-studies">Used in: <strong>Your MP's ₹5 Crore</strong></div>
+          <a href="https://mplads.mospi.gov.in" target="_blank" rel="noopener" class="ds-link">mplads.mospi.gov.in →</a>
+        </div>
+
+        <div class="ds-card">
+          <div class="ds-top">
+            <div class="ds-icon govt">🔍</div>
+            <div>
+              <div class="ds-title">Comptroller and Auditor General (CAG)</div>
+              <div class="ds-org">Government of India — Constitutional Authority</div>
+            </div>
+          </div>
+          <p class="ds-body">Audit reports covering scheme performance, year-end expenditure rush, off-budget liabilities, and MPLADS compliance. CAG reports are the gold standard for accountability findings — cited extensively across multiple studies.</p>
+          <div class="ds-studies">Used in: <strong>March Rush, MP's ₹5 Crore, State Debt</strong></div>
+          <a href="https://cag.gov.in" target="_blank" rel="noopener" class="ds-link">cag.gov.in →</a>
+        </div>
+
+        <div class="ds-card">
+          <div class="ds-top">
+            <div class="ds-icon parliament">🗳️</div>
+            <div>
+              <div class="ds-title">PRS Legislative Research — Parliament Track</div>
+              <div class="ds-org">Non-partisan research service</div>
+            </div>
+          </div>
+          <p class="ds-body">Structured database of MP attendance, questions asked, debates participated in, and private member bills introduced — compiled from official Lok Sabha records. Updated after each session. Used as the primary source for The Absent MP study.</p>
+          <div class="ds-studies">Used in: <strong>The Absent MP</strong></div>
+          <a href="https://prsindia.org/parliamenttrack" target="_blank" rel="noopener" class="ds-link">prsindia.org/parliamenttrack →</a>
+        </div>
+
+        <div class="ds-card">
+          <div class="ds-top">
+            <div class="ds-icon rbi">🏦</div>
+            <div>
+              <div class="ds-title">RBI State Finances: A Study of Budgets</div>
+              <div class="ds-org">Reserve Bank of India — Annual Publication</div>
+            </div>
+          </div>
+          <p class="ds-body">Annual RBI publication providing state-wise analysis of debt, deficits, revenue receipts, capital expenditure, and pension commitments. The most comprehensive normalised dataset for comparing state fiscal health across years.</p>
+          <div class="ds-studies">Used in: <strong>State Debt, Pension Timebomb</strong></div>
+          <a href="https://rbi.org.in" target="_blank" rel="noopener" class="ds-link">rbi.org.in →</a>
+        </div>
+
+        <div class="ds-card">
+          <div class="ds-top">
+            <div class="ds-icon rbi">📈</div>
+            <div>
+              <div class="ds-title">RBI Currency and Finance Report 2022–23</div>
+              <div class="ds-org">Reserve Bank of India</div>
+            </div>
+          </div>
+          <p class="ds-body">Contains the RBI's landmark warning on OPS reversion as the "single biggest medium-term fiscal risk" for state governments. Chapter IV provides actuarial projections of pension burdens under OPS vs NPS scenarios to 2040.</p>
+          <div class="ds-studies">Used in: <strong>Pension Timebomb</strong></div>
+          <a href="https://rbidocs.rbi.org.in" target="_blank" rel="noopener" class="ds-link">rbidocs.rbi.org.in →</a>
+        </div>
+
+        <div class="ds-card">
+          <div class="ds-top">
+            <div class="ds-icon research">🎓</div>
+            <div>
+              <div class="ds-title">NIPFP Working Papers</div>
+              <div class="ds-org">National Institute of Public Finance and Policy</div>
+            </div>
+          </div>
+          <p class="ds-body">Peer-reviewed policy research on Indian public finance. Used for scheme rationalisation analysis (Working Paper 2016 Sub-Group findings) and actuarial modelling of OPS vs NPS liabilities (Working Paper No. 395, 2023).</p>
+          <div class="ds-studies">Used in: <strong>Scheme Maze, Pension Timebomb</strong></div>
+          <a href="https://nipfp.org.in" target="_blank" rel="noopener" class="ds-link">nipfp.org.in →</a>
+        </div>
+
+        <div class="ds-card">
+          <div class="ds-top">
+            <div class="ds-icon govt">🏢</div>
+            <div>
+              <div class="ds-title">Union Budget — Statement 16</div>
+              <div class="ds-org">Ministry of Finance, Government of India</div>
+            </div>
+          </div>
+          <p class="ds-body">Statement 16 of the Union Budget provides the official list of all Centrally Sponsored Schemes (CSS) with budget allocations by scheme, ministry, and year. The primary source for the Scheme Maze study on CSS concentration.</p>
+          <div class="ds-studies">Used in: <strong>Scheme Maze</strong></div>
+          <a href="https://indiabudget.gov.in" target="_blank" rel="noopener" class="ds-link">indiabudget.gov.in →</a>
+        </div>
+
+        <div class="ds-card">
+          <div class="ds-top">
+            <div class="ds-icon govt">💰</div>
+            <div>
+              <div class="ds-title">PFRDA Annual Reports</div>
+              <div class="ds-org">Pension Fund Regulatory and Development Authority</div>
+            </div>
+          </div>
+          <p class="ds-body">Annual reporting on NPS corpus size, subscriber counts by state and sector, and contribution rates. Used to estimate the NPS corpus foregone by states that reverted to OPS, and to benchmark NPS fiscal performance against OPS.</p>
+          <div class="ds-studies">Used in: <strong>Pension Timebomb</strong></div>
+          <a href="https://pfrda.org.in" target="_blank" rel="noopener" class="ds-link">pfrda.org.in →</a>
+        </div>
+
+        <div class="ds-card">
+          <div class="ds-top">
+            <div class="ds-icon parliament">📋</div>
+            <div>
+              <div class="ds-title">Lok Sabha Secretariat</div>
+              <div class="ds-org">Parliament of India</div>
+            </div>
+          </div>
+          <p class="ds-body">Official records of Lok Sabha sitting days, quorum notices, attendance registers, questions listed and answered. Primary source for MP attendance data before aggregation by PRS Legislative Research.</p>
+          <div class="ds-studies">Used in: <strong>The Absent MP</strong></div>
+          <a href="https://loksabha.nic.in" target="_blank" rel="noopener" class="ds-link">loksabha.nic.in →</a>
+        </div>
+
+        <div class="ds-card">
+          <div class="ds-top">
+            <div class="ds-icon govt">🌐</div>
+            <div>
+              <div class="ds-title">data.gov.in — Open Government Data</div>
+              <div class="ds-org">National Informatics Centre, Government of India</div>
+            </div>
+          </div>
+          <p class="ds-body">Aggregated datasets from central and state ministries, including scheme-wise expenditure, state utilisation tables, and social sector outcomes. Used as a supplementary source for scheme and MPLADS data.</p>
+          <div class="ds-studies">Used in: <strong>March Rush, MP's ₹5 Crore, Scheme Maze</strong></div>
+          <a href="https://data.gov.in" target="_blank" rel="noopener" class="ds-link">data.gov.in →</a>
+        </div>
+
+        <div class="ds-card">
+          <div class="ds-top">
+            <div class="ds-icon research">🏗️</div>
+            <div>
+              <div class="ds-title">NITI Aayog — DMEO</div>
+              <div class="ds-org">Development Monitoring and Evaluation Office</div>
+            </div>
+          </div>
+          <p class="ds-body">The evaluation arm of NITI Aayog publishes independent assessments of CSS performance, including third-party evaluations of scheme outcomes and state utilisation patterns. Used for the Scheme Maze study's performance section.</p>
+          <div class="ds-studies">Used in: <strong>Scheme Maze</strong></div>
+          <a href="https://dmeo.gov.in" target="_blank" rel="noopener" class="ds-link">dmeo.gov.in →</a>
+        </div>
+
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- METHODOLOGY NOTE -->
+    <div class="section-block">
+      <div class="section-tag">Methodology</div>
+      <h2 class="section-title">A Note on Indicative Data</h2>
+      <div class="license-box">
+        <div class="license-title">Why "indicative" — and what it means</div>
+        <p class="license-body">
+          All charts and numbers on DataTruth are sourced from the publications listed above. Where specific figures are not individually verifiable (e.g., individual MP attendance rates from years before PRS began systematically tracking, or state-level off-budget liabilities not yet disclosed), data is <strong>scaled or modelled based on published aggregate patterns</strong> and labelled with the yellow notice banner at the top of each study page.<br><br>
+          The phrase "indicative data based on published patterns" means: the shape of the data (trend direction, relative magnitudes, year-over-year changes) is derived from real government publications; the exact per-MP or per-state figure shown may differ from official records by a small margin. We use this approach to illustrate structural patterns that are clearly documented in audit and policy literature — <strong>not to fabricate findings</strong>.<br><br>
+          Every key finding — the 22–25% March spending share, the ₹528 crore MPLADS lapse, the Punjab 53% debt/GSDP ratio, the 133-scheme CSS structure — is directly cited from official sources. Download links to primary sources are provided on each study page.
+        </p>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- LICENSE -->
+    <div class="section-block">
+      <div class="section-tag">License &amp; Reuse</div>
+      <h2 class="section-title">Using DataTruth</h2>
+
+      <div class="license-box">
+        <div style="display:flex;align-items:flex-start;gap:1.5rem;flex-wrap:wrap;margin-bottom:1.25rem;">
+          <div>
+            <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener license" style="display:inline-block;margin-bottom:.625rem">
+              <img src="https://www.gnu.org/graphics/gplv3-88x31.png" alt="GNU GPL v3" style="border-radius:4px;border:1px solid var(--border)" />
+            </a>
+            <div style="font-size:.8rem;color:var(--txt3);margin-top:.25rem">GNU GPL v3.0</div>
+          </div>
+          <div>
+            <div class="license-title" style="margin-bottom:.5rem">GNU General Public License v3.0</div>
+            <p style="font-size:.875rem;color:var(--txt2);line-height:1.65">
+              DataTruth — its code, design, analysis, and content — is free software licensed under the
+              <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener" style="color:var(--blue)">GNU General Public License v3.0</a>.
+              You can redistribute it and/or modify it under the terms of the GPL as published by the Free Software Foundation.
+            </p>
+          </div>
+        </div>
+        <p class="license-body">
+          <strong>You are free to:</strong><br>
+          — <strong>Use</strong> — run and study this project for any purpose<br>
+          — <strong>Share</strong> — copy and redistribute the source code<br>
+          — <strong>Modify</strong> — change the code to create derivative works<br><br>
+          <strong>Conditions:</strong><br>
+          — <strong>Copyleft</strong> — if you distribute a modified version, the full source code of your version must also be released under GPL v3<br>
+          — <strong>Attribution</strong> — you must retain the original copyright notice and licence in all copies<br>
+          — <strong>No warranty</strong> — the software is provided as-is, without warranty of any kind<br><br>
+          <strong>Government data:</strong> All data derived from Government of India sources is in the public domain under Section 52 of the Indian Copyright Act, 1957. No licence restriction applies to the underlying government data — only to DataTruth's original code and analysis layer.<br><br>
+          The full licence text is available in the <a href="https://github.com/siddharth2798/datatruth/blob/main/LICENSE" target="_blank" rel="noopener" style="color:var(--blue)">LICENSE file on GitHub</a>.
+        </p>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- ACKNOWLEDGEMENTS -->
+    <div class="section-block">
+      <div class="section-tag">Acknowledgements</div>
+      <h2 class="section-title">Standing on Shoulders</h2>
+      <p class="section-body">DataTruth exists because of the work of researchers, journalists, and institutions who have spent years making Indian government data accessible and analysable.</p>
+
+      <div class="ack-grid">
+        <div class="ack-card">
+          <div class="ack-icon">📋</div>
+          <div class="ack-name">PRS Legislative Research</div>
+          <div class="ack-desc">For systematically compiling and publishing MP-level parliamentary performance data that is otherwise buried in Lok Sabha archives</div>
+        </div>
+        <div class="ack-card">
+          <div class="ack-icon">🏛️</div>
+          <div class="ack-name">CAG of India</div>
+          <div class="ack-desc">For three decades of consistent, independent audit reporting that documents exactly where public money is being wasted or hidden</div>
+        </div>
+        <div class="ack-card">
+          <div class="ack-icon">🔬</div>
+          <div class="ack-name">NIPFP Researchers</div>
+          <div class="ack-desc">For making actuarial and fiscal policy modelling open access and understandable to non-economists through accessible working papers</div>
+        </div>
+        <div class="ack-card">
+          <div class="ack-icon">📰</div>
+          <div class="ack-name">Data Journalists</div>
+          <div class="ack-desc">The Reporters' Collective, The Wire, Scroll, and IndiaSpend — for establishing that government data analysis is journalism, not academic niche</div>
+        </div>
+        <div class="ack-card">
+          <div class="ack-icon">💻</div>
+          <div class="ack-name">Open Source Community</div>
+          <div class="ack-desc">Chart.js contributors, Rasmus Andersson (Inter), and the open web standards community — for making rich data presentation accessible without paywalls</div>
+        </div>
+        <div class="ack-card">
+          <div class="ack-icon">🌐</div>
+          <div class="ack-name">Open Government Data</div>
+          <div class="ack-desc">The NIC team behind data.gov.in and every ministry that publishes machine-readable data — making accountability analysis possible in the first place</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">Data<span>Truth</span></div>
+  <p>India's public money, made legible. Built with open data from the Government of India.</p>
+  <ul class="footer-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="march-rush.html">The March Rush</a></li>
+    <li><a href="mplads.html">MP's ₹5 Crore</a></li>
+    <li><a href="absent-mp.html">The Absent MP</a></li>
+    <li><a href="state-debt.html">State Debt</a></li>
+    <li><a href="scheme-maze.html">Scheme Maze</a></li>
+    <li><a href="pension-bomb.html">Pension Bomb</a></li>
+    <li><a href="credits.html">Credits</a></li>
+  </ul>
+</footer>
+
+<button id="btt" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="position:fixed;bottom:1.5rem;right:1.5rem;width:40px;height:40px;background:var(--navy);color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:1.1rem;opacity:0;transition:opacity .2s,transform .2s;transform:translateY(8px);z-index:98;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,.25)">↑</button>
+
+<script>
+(function(){
+  var p=document.getElementById('progress'), b=document.getElementById('btt');
+  window.addEventListener('scroll',function(){
+    var t=document.documentElement.scrollHeight-window.innerHeight;
+    if(p) p.style.width=(t>0?window.scrollY/t*100:0)+'%';
+    if(b){ b.style.opacity=window.scrollY>300?1:0; b.style.transform=window.scrollY>300?'translateY(0)':'translateY(8px)'; }
+  },{passive:true});
+})();
+</script>
+</body>
+</html>

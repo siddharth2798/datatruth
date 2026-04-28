@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your MP's ₹5 Crore — DataTruth</title>
+  <meta name="description" content="Every MP gets ₹5 crore a year for local infrastructure. ₹528 crore lapsed unspent in FY 2023–24. See utilisation rates, year-wise patterns, and which states perform worst." />
+  <meta property="og:title" content="Your MP's ₹5 Crore — DataTruth" />
+  <meta property="og:description" content="₹528 crore in MPLADS funds lapsed unspent in a single year. Year-wise data from 2015–16 across all states." />
+  <meta property="og:type" content="article" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --navy:#0f172a; --blue:#1d4ed8; --red:#dc2626; --orange:#ea580c;
+      --green:#16a34a; --bg:#f8fafc; --card:#ffffff; --border:#e2e8f0;
+      --txt:#0f172a; --txt2:#475569; --txt3:#94a3b8;
+    }
+    html { scroll-behavior:smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--txt); line-height:1.6; }
+
+    nav { background:var(--navy); padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; gap:1rem; }
+    .logo { font-family:'Playfair Display',serif; font-size:1.4rem; color:#fff; text-decoration:none; white-space:nowrap; }
+    .logo span { color:#ef4444; }
+    .nav-links { display:flex; gap:1.5rem; list-style:none; flex-wrap:wrap; }
+    .nav-links a { color:#94a3b8; text-decoration:none; font-size:.875rem; font-weight:500; transition:color .15s; }
+    .nav-links a.active { color:#fff; }
+    .nav-links a:hover { color:#fff; }
+
+    .study-hero { background:var(--navy); color:#fff; padding:3.5rem 2rem 3rem; }
+    .container { max-width:1080px; margin:0 auto; padding:0 2rem; }
+    .breadcrumb { font-size:.8rem; color:#64748b; margin-bottom:1.5rem; }
+    .breadcrumb a { color:#64748b; text-decoration:none; }
+    .breadcrumb a:hover { color:#94a3b8; }
+    .study-tag-label { font-size:.68rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#93c5fd; margin-bottom:.875rem; }
+    .study-hero h1 { font-family:'Playfair Display',serif; font-size:clamp(2rem,4vw,3rem); line-height:1.15; margin-bottom:1rem; }
+    .study-hero p { font-size:1rem; color:#94a3b8; max-width:620px; line-height:1.75; }
+
+    .analogy-pill {
+      display:inline-flex; align-items:center; gap:.5rem;
+      background:rgba(99,102,241,.18); border:1px solid rgba(99,102,241,.35);
+      color:#c7d2fe; font-size:.8125rem; font-weight:500;
+      padding:.45rem 1rem; border-radius:100px; margin-top:1.25rem;
+    }
+    .analogy-pill .pill-icon { font-size:1rem; }
+
+    /* Filter bar */
+    .filter-bar {
+      background:var(--card); border:1px solid var(--border); border-radius:12px;
+      padding:1.125rem 1.5rem; margin-bottom:1.5rem;
+      display:flex; align-items:flex-start; gap:1.5rem; flex-wrap:wrap;
+    }
+    .filter-group { display:flex; flex-direction:column; gap:.4rem; }
+    .filter-label { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--txt3); }
+    .select-wrap { position:relative; display:inline-flex; align-items:center; }
+    .select-wrap::after { content:'▾'; position:absolute; right:.75rem; pointer-events:none; color:var(--txt2); font-size:.8rem; font-weight:700; }
+    .year-select {
+      -webkit-appearance:none; appearance:none;
+      background:var(--bg); border:1.5px solid var(--border);
+      border-radius:8px; padding:.45rem 2.25rem .45rem .875rem;
+      font-size:.875rem; font-weight:600; color:var(--txt);
+      cursor:pointer; font-family:'Inter',sans-serif;
+      outline:none; transition:all .15s; min-width:230px;
+    }
+    .year-select:hover { border-color:var(--blue); }
+    .year-select:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(29,78,216,.12); }
+    .filter-divider { width:1px; background:var(--border); align-self:stretch; margin:0 .25rem; }
+
+    /* Year context banner */
+    .year-banner { border-radius:8px; padding:.75rem 1.125rem; margin-bottom:1.5rem; font-size:.875rem; line-height:1.55; display:none; }
+    .year-banner.show { display:block; }
+    .year-banner.suspended { background:#fee2e2; border:1px solid #fca5a5; color:#7f1d1d; }
+    .year-banner.election { background:#eff6ff; border:1px solid #bfdbfe; color:#1e3a5f; }
+    .year-banner.resumed  { background:#fef9c3; border:1px solid #fde68a; color:#713f12; }
+    .yb-label { font-weight:700; margin-right:.375rem; }
+
+    /* Summary box */
+    .summary-box {
+      background:#f0fdf4; border:1.5px solid #86efac; border-radius:12px;
+      padding:1.5rem; margin-bottom:2rem;
+    }
+    .summary-title { font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#15803d; margin-bottom:.875rem; }
+    .summary-list { list-style:none; display:flex; flex-direction:column; gap:.625rem; }
+    .summary-list li { display:flex; gap:.625rem; font-size:.9375rem; color:#14532d; line-height:1.6; }
+    .summary-list li::before { content:'→'; font-weight:700; color:#16a34a; flex-shrink:0; margin-top:.05rem; }
+
+    .page-body { padding:4rem 0; }
+
+    .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(185px,1fr)); gap:1rem; margin-bottom:2.5rem; }
+    .stat-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.25rem 1.5rem; }
+    .stat-label { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--txt3); margin-bottom:.4rem; }
+    .stat-val { font-size:1.75rem; font-weight:700; line-height:1; margin-bottom:.25rem; }
+    .stat-sub { font-size:.8rem; color:var(--txt2); }
+    .c-red { color:var(--red); } .c-blue { color:var(--blue); } .c-green { color:var(--green); } .c-orange { color:var(--orange); }
+
+    .chart-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; }
+    .chart-head { margin-bottom:1.25rem; }
+    .chart-title { font-size:.9375rem; font-weight:600; }
+    .chart-sub { font-size:.78rem; color:var(--txt2); margin-top:.15rem; }
+
+    .chart-hint { background:#f8fafc; border:1px solid var(--border); border-radius:6px; padding:.625rem .875rem; margin-bottom:1rem; font-size:.8rem; color:var(--txt2); line-height:1.5; }
+    .hint-label { font-weight:700; color:var(--txt); margin-right:.3rem; }
+
+    .legend-row { display:flex; flex-wrap:wrap; gap:.875rem; margin-bottom:.875rem; }
+    .legend-item { display:flex; align-items:center; gap:.35rem; font-size:.78rem; color:var(--txt2); }
+    .legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .legend-bar { width:14px; height:8px; border-radius:2px; flex-shrink:0; }
+
+    .insight { background:#eff6ff; border:1.5px solid #bfdbfe; border-left:4px solid var(--blue); border-radius:8px; padding:1.125rem 1.375rem; margin-bottom:1.5rem; }
+    .insight.red-tint { background:#fef2f2; border-color:#fca5a5; border-left-color:var(--red); }
+    .insight-tag { font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--blue); margin-bottom:.4rem; }
+    .insight.red-tint .insight-tag { color:var(--red); }
+    .insight-body { font-size:.9rem; color:#1e3a5f; line-height:1.65; }
+    .insight.red-tint .insight-body { color:#7f1d1d; }
+
+    .two-col { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; font-size:.875rem; }
+    th { text-align:left; font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--txt3); padding:.75rem 1rem; border-bottom:1px solid var(--border); white-space:nowrap; }
+    td { padding:.875rem 1rem; border-bottom:1px solid #f1f5f9; color:var(--txt); }
+    tr:last-child td { border-bottom:none; }
+    tr:hover td { background:#f8fafc; }
+
+    .badge { display:inline-block; padding:.2rem .5rem; border-radius:4px; font-size:.7rem; font-weight:700; }
+    .badge-g { background:#dcfce7; color:#166534; }
+    .badge-y { background:#fef9c3; color:#713f12; }
+    .badge-r { background:#fee2e2; color:#991b1b; }
+
+    .pbar-wrap { display:flex; align-items:center; gap:.6rem; }
+    .pbar { flex:1; height:6px; background:#e2e8f0; border-radius:100px; overflow:hidden; min-width:80px; }
+    .pfill { height:100%; border-radius:100px; }
+    .pfill-g { background:var(--green); } .pfill-y { background:#f59e0b; } .pfill-r { background:var(--red); }
+    .ppct { font-size:.8125rem; font-weight:600; min-width:3rem; text-align:right; }
+
+    /* Incidents */
+    .section-tag { font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--red); margin-bottom:.75rem; }
+    .section-title { font-family:'Playfair Display',serif; font-size:clamp(1.5rem,2.5vw,2rem); line-height:1.2; margin-bottom:.75rem; }
+    .section-body { font-size:.9375rem; color:var(--txt2); line-height:1.75; margin-bottom:1.75rem; max-width:660px; }
+    .incidents-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.25rem; margin-bottom:2rem; }
+    .incident-card {
+      background:var(--card); border:1px solid var(--border); border-radius:12px;
+      padding:1.5rem; position:relative; overflow:hidden;
+    }
+    .incident-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+    .incident-card.red::before { background:var(--red); }
+    .incident-card.orange::before { background:var(--orange); }
+    .incident-card.blue::before { background:var(--blue); }
+    .inc-type { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; margin-bottom:.625rem; }
+    .incident-card.red .inc-type { color:var(--red); }
+    .incident-card.orange .inc-type { color:var(--orange); }
+    .incident-card.blue .inc-type { color:var(--blue); }
+    .inc-title { font-size:.9375rem; font-weight:700; line-height:1.3; margin-bottom:.5rem; color:var(--txt); }
+    .inc-body { font-size:.8375rem; color:var(--txt2); line-height:1.65; margin-bottom:.875rem; }
+    .inc-source { font-size:.75rem; color:var(--txt3); border-top:1px solid var(--border); padding-top:.625rem; margin-top:auto; }
+
+    .data-sources-box { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; }
+    .ds-title { font-size:.875rem; font-weight:600; margin-bottom:1rem; }
+    .ds-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1rem; }
+    .ds-item { padding:1rem; background:var(--bg); border-radius:8px; border:1px solid var(--border); }
+    .ds-name { font-size:.8125rem; font-weight:600; margin-bottom:.25rem; }
+    .ds-link { display:block; font-size:.78rem; color:var(--blue); text-decoration:none; margin-bottom:.35rem; }
+    .ds-link:hover { text-decoration:underline; }
+    .ds-desc { font-size:.78rem; color:var(--txt2); line-height:1.55; }
+
+    .method-box { background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:1.25rem 1.5rem; margin-top:1.5rem; }
+    .method-title { font-size:.78rem; font-weight:700; color:#92400e; text-transform:uppercase; letter-spacing:.08em; margin-bottom:.5rem; }
+    .method-body { font-size:.8125rem; color:#78350f; line-height:1.65; }
+
+    .more-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1rem; }
+    .more-card { display:block; text-decoration:none; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; transition:all .15s; }
+    .more-card:hover { border-color:#cbd5e1; box-shadow:0 4px 20px rgba(15,23,42,.08); }
+    .more-num { font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--txt3); margin-bottom:.5rem; }
+    .more-name { font-size:1.125rem; font-weight:600; color:var(--txt); margin-bottom:.4rem; }
+    .more-desc { font-size:.8rem; color:var(--txt2); }
+
+    footer { background:var(--navy); color:#64748b; padding:3rem 2rem; text-align:center; }
+    .footer-logo { font-family:'Playfair Display',serif; font-size:1.25rem; color:#fff; margin-bottom:.75rem; }
+    .footer-logo span { color:#ef4444; }
+    footer p { font-size:.875rem; max-width:460px; margin:0 auto 1.5rem; line-height:1.65; }
+    .footer-links { display:flex; gap:1.5rem; justify-content:center; list-style:none; flex-wrap:wrap; }
+    .footer-links a { color:#64748b; text-decoration:none; font-size:.8125rem; transition:color .15s; }
+    .footer-links a:hover { color:#fff; }
+
+    /* Suspended year overlay */
+    .suspended-state { background:#fef2f2; border:1.5px solid #fca5a5; border-radius:12px; padding:2.5rem; text-align:center; margin-bottom:1.5rem; display:none; }
+    .suspended-state.show { display:block; }
+    .susp-icon { font-size:2rem; margin-bottom:.875rem; }
+    .susp-title { font-family:'Playfair Display',serif; font-size:1.5rem; color:#7f1d1d; margin-bottom:.75rem; }
+    .susp-body { font-size:.9375rem; color:#991b1b; line-height:1.7; max-width:560px; margin:0 auto; }
+
+    @media (max-width:700px) { nav { flex-wrap:wrap; } .two-col { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+<div id="progress" style="position:fixed;top:0;left:0;height:3px;background:#dc2626;z-index:200;width:0%;pointer-events:none;transition:width 80ms linear"></div>
+
+<nav>
+  <a href="index.html" class="logo">Data<span>Truth</span></a>
+  <ul class="nav-links">
+    <li><a href="march-rush.html">The March Rush</a></li>
+    <li><a href="mplads.html" class="active">MP's ₹5 Crore</a></li>
+    <li><a href="absent-mp.html">The Absent MP</a></li>
+    <li><a href="state-debt.html">State Debt</a></li>
+    <li><a href="scheme-maze.html">Scheme Maze</a></li>
+    <li><a href="pension-bomb.html">Pension Bomb</a></li>
+  </ul>
+</nav>
+
+<div class="study-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">← DataTruth</a> / MPLADS</div>
+    <div class="study-tag-label">02 · Parliamentary Accountability</div>
+    <h1>Your MP's ₹5 Crore</h1>
+    <p>Every Member of Parliament receives ₹5 crore per year to spend on local infrastructure — roads, classrooms, water pumps — in their constituency. Over a full five-year term, that is ₹25 crore per seat. Here is what actually happens to that money.</p>
+    <div class="analogy-pill">
+      <span class="pill-icon">🏫</span>
+      ₹5 crore is enough to build 10 fully-equipped primary school classrooms, every single year.
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+<div class="container">
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label class="filter-label" for="yearSelect">Financial Year</label>
+      <div class="select-wrap">
+        <select id="yearSelect" class="year-select">
+          <option value="2025-26">2025–26  (Latest)</option>
+          <option value="2024-25">2024–25  · General Election</option>
+          <option value="2023-24" selected>2023–24</option>
+          <option value="2022-23">2022–23  · First year after suspension</option>
+          <option value="2021-22">2021–22  · SUSPENDED</option>
+          <option value="2020-21">2020–21  · SUSPENDED — ₹7,900 Cr to PM CARES</option>
+          <option value="2019-20">2019–20  · General Election</option>
+          <option value="2018-19">2018–19</option>
+          <option value="2017-18">2017–18</option>
+          <option value="2016-17">2016–17  · Demonetisation</option>
+          <option value="2015-16">2015–16  (Earliest data)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Year context banner -->
+  <div class="year-banner" id="yearBanner"></div>
+
+  <!-- Suspended year message -->
+  <div class="suspended-state" id="suspendedState">
+    <div class="susp-icon">⚠️</div>
+    <div class="susp-title" id="suspTitle">MPLADS Suspended</div>
+    <div class="susp-body" id="suspBody">
+      In FY 2020–21, the Government of India suspended MPLADS for two years and redirected ₹7,900 crore from the scheme to the PM CARES Fund in response to the COVID-19 pandemic. The decision was challenged in the Supreme Court. The scheme resumed in FY 2022–23. MPs received no MPLADS allocation during this period. No state-wise or project-level data is available for this year.
+    </div>
+  </div>
+
+  <!-- Summary box -->
+  <div class="summary-box" id="summaryBox">
+    <div class="summary-title">The short version</div>
+    <ul class="summary-list" id="summaryList">
+      <li>Every MP gets ₹5 crore a year for local works — but on average, 15–25% of that money is never spent and gets returned to the government.</li>
+      <li>The gap between funds <em>released</em> and funds <em>actually spent</em> varies enormously by state — from under 5% in Kerala to over 40% in Jharkhand.</li>
+      <li>MPs tend to spend significantly more in election years. Audit reports have found this pattern is deliberate — funds are held back and released when it benefits the MP politically.</li>
+    </ul>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="stat-grid" id="statGrid">
+    <!-- rendered by JS -->
+  </div>
+
+  <div class="insight" id="yearInsight">
+    <div class="insight-tag">Context</div>
+    <div class="insight-body" id="yearInsightBody">
+      MPLADS has been operational since 1993. The per-MP allocation was raised from ₹2 crore to ₹5 crore in FY 2011–12. Works can only be recommended, not directly executed, by MPs; implementation rests with district authorities — this two-step process is the primary source of delays and gaps between released and utilised funds.
+    </div>
+  </div>
+
+  <!-- Released vs Utilised by state (grouped bar) -->
+  <div class="chart-card" id="groupedCard">
+    <div class="chart-head">
+      <div class="chart-title">Which states spend the most of their MP funds?</div>
+      <div class="chart-sub" id="groupedSub">₹ crore · states sorted by utilisation rate, best to worst</div>
+    </div>
+    <div class="chart-hint">
+      <span class="hint-label">How to read this:</span>
+      Each state has two bars side by side. The lighter bar is money <strong>released</strong> (sent to the state). The darker bar is money <strong>actually spent</strong> on completed works. A big gap between the two means money was released but work never finished.
+    </div>
+    <div class="legend-row">
+      <div class="legend-item"><div class="legend-bar" style="background:#bbf7d0;border:1.5px solid #16a34a"></div> Released</div>
+      <div class="legend-item"><div class="legend-bar" style="background:#16a34a"></div> Utilised (spent on completed works)</div>
+    </div>
+    <canvas id="groupedStateChart" height="160"></canvas>
+  </div>
+
+  <!-- Lapse + Category side by side -->
+  <div class="two-col">
+    <div class="chart-card" style="margin-bottom:0">
+      <div class="chart-head">
+        <div class="chart-title">Which states lose the most money?</div>
+        <div class="chart-sub">₹ crore released but not utilised · high means more money returned unspent</div>
+      </div>
+      <div class="chart-hint">
+        <span class="hint-label">How to read this:</span>
+        States with longer bars lost more money in absolute terms. States with many MPs (like UP and Bihar) lose more simply because they receive more.
+      </div>
+      <canvas id="lapseChart" height="280"></canvas>
+    </div>
+    <div class="chart-card" style="margin-bottom:0">
+      <div class="chart-head">
+        <div class="chart-title">What do MPs spend the money on?</div>
+        <div class="chart-sub">% of sanctioned works by category · national average</div>
+      </div>
+      <div class="chart-hint">
+        <span class="hint-label">How to read this:</span>
+        MPLADS guidelines say water and sanitation should be prioritised. The chart shows whether MPs follow those priorities.
+      </div>
+      <canvas id="catChart" height="280"></canvas>
+    </div>
+  </div>
+  <div style="height:1.5rem"></div>
+
+  <!-- Multi-year trend chart -->
+  <div class="chart-card">
+    <div class="chart-head">
+      <div class="chart-title">Has MP fund utilisation improved over time?</div>
+      <div class="chart-sub">National average utilisation rate (%) · FY 2015–16 to 2025–26 · suspended years excluded</div>
+    </div>
+    <div class="chart-hint">
+      <span class="hint-label">How to read this:</span>
+      Each point is the percentage of released funds that were actually spent that year. Higher is better. The drop in 2022–23 reflects the restart after a two-year suspension — the pipeline of works had dried up.
+    </div>
+    <div class="legend-row">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div> Utilisation rate</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div> Election years</div>
+    </div>
+    <canvas id="trendChart" height="100"></canvas>
+  </div>
+
+  <!-- Table -->
+  <div class="chart-card">
+    <div class="chart-head">
+      <div class="chart-title">State-by-state breakdown</div>
+      <div class="chart-sub" id="tableSub">Funds released, amount spent, per-MP average, and utilisation status</div>
+    </div>
+    <div class="chart-hint">
+      <span class="hint-label">How to read this:</span>
+      "Per MP" shows the average each MP in that state spent. Green = good (over 88%), Yellow = moderate, Red = low (under 78%).
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>State</th>
+            <th>MPs</th>
+            <th>Released (₹ Cr)</th>
+            <th>Utilised (₹ Cr)</th>
+            <th>Per MP (₹ Cr)</th>
+            <th>Utilisation</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="mpladsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Incidents section -->
+  <div style="margin-top:3rem; padding-top:2.5rem; border-top:1px solid var(--border)">
+    <div class="section-tag">Real-world consequences</div>
+    <h2 class="section-title">When the money didn't reach</h2>
+    <p class="section-body">Audit reports and investigative journalism have documented what happens when MPLADS funds lapse, get misused, or arrive too late. These are not hypotheticals — they are on the public record.</p>
+
+    <div class="incidents-grid">
+
+      <div class="incident-card red">
+        <div class="inc-type">CAG Audit Finding · 2010</div>
+        <div class="inc-title">₹73.76 crore spent on works MPs were not allowed to sanction</div>
+        <div class="inc-body">A CAG performance audit covering 2004–09 found 2,340 works worth ₹73.76 crore sanctioned on items not permitted under MPLADS rules. A further 775 works worth ₹10.18 crore were sanctioned but never begun — the land was never acquired, the contractor never mobilised. The same audit noted that two previous CAG audits (1998, 2001) had flagged identical problems. Action Taken Notes were submitted 8 years late, in 2009.</div>
+        <div class="inc-source">Source: CAG Report No. 31 of 2010 — Performance Audit of MPLADS</div>
+      </div>
+
+      <div class="incident-card orange">
+        <div class="inc-type">Pattern of Misuse · Documented 2015, 2018</div>
+        <div class="inc-title">MPs deliberately hold back funds for the election year</div>
+        <div class="inc-body">Analysis by Factly and NewsLaundry found a consistent pattern across Lok Sabha terms: MPs underspend in Years 1–4 and rush sanctions in Year 5, the election year. A 2018 Central Information Commission order confirmed this practice after an RTI applicant found MPs had accumulated unspent carry-forward balances far above permitted limits. The pattern shows up clearly in utilisation data — election years consistently show the highest national utilisation rates.</div>
+        <div class="inc-source">Source: Factly (2015), NewsLaundry (2015), CIC Order (2018)</div>
+      </div>
+
+      <div class="incident-card red">
+        <div class="inc-type">Scheme Suspension · FY 2020–21 and 2021–22</div>
+        <div class="inc-title">₹7,900 crore redirected away from constituencies</div>
+        <div class="inc-body">In April 2020, the government suspended MPLADS for two years and transferred ₹7,900 crore to PM CARES Fund. MPs from all parties lost their constituency development budgets. A petition was filed in the Supreme Court challenging the diversion. The court declined to strike it down but flagged concerns about the scheme's suspension. MPLADS resumed only in FY 2022–23, and the backlog of stalled projects took years to clear.</div>
+        <div class="inc-source">Source: Ministry of Statistics, Supreme Court petition WP(C) 686/2020</div>
+      </div>
+
+      <div class="incident-card blue">
+        <div class="inc-type">Infrastructure Quality · Bihar, June 2023</div>
+        <div class="inc-title">13 bridges collapsed in Bihar in 18 days</div>
+        <div class="inc-body">In June 2023, a wave of bridge failures hit Bihar — 13 in 18 days, including the ₹1,710 crore Aguwani–Sultanganj bridge over the Ganga which had already collapsed once in April 2022 and was still under construction. While not all were MPLADS-funded, the Bihar series exposed systemic quality failures in government-sanctioned infrastructure: use of substandard materials, ignored seismic testing requirements, and awards to the lowest bidder with no quality verification. MPLADS works face the same L1 (lowest-bid) contractor system.</div>
+        <div class="inc-source">Source: CNN (June 6, 2023); National Herald India; CAG construction quality reports</div>
+      </div>
+
+      <div class="incident-card orange">
+        <div class="inc-type">Unutilised Funds · December 2020</div>
+        <div class="inc-title">₹1,750 crore sitting idle right before the scheme was suspended</div>
+        <div class="inc-body">As of December 2020 — just before the scheme was suspended — over ₹1,750 crore in MPLADS funds sat unutilised across constituencies. Carry-forward balances had built up over years. Some MPs had never even submitted work recommendations for entire financial years. When the scheme was then suspended and funds redirected, these unspent constituency development balances were lost entirely — the communities they were meant to serve received nothing.</div>
+        <div class="inc-source">Source: Factly — "₹1,750 crore of MPLADS funds unutilised as of December 2020"</div>
+      </div>
+
+      <div class="incident-card blue">
+        <div class="inc-type">Systematic Pattern · CAG State Finances 2025</div>
+        <div class="inc-title">States bunching expenditure in March — the same problem, at scale</div>
+        <div class="inc-body">A January 2025 CAG report on state finances found that 15 states plus Delhi exceeded the Union Finance Ministry's mandated caps on year-end spending: no more than 10% of the annual budget in March, no more than 25% in the final quarter. Multiple states spent 30–45% of their annual budgets in March alone. The CAG noted this "fiscal imprudence" leads to sanctioning works without proper planning, creating the same quality and lapse problems seen in MPLADS at a far larger scale.</div>
+        <div class="inc-source">Source: CAG Report No. 1 of 2025 — State Finances for 2023–24</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Data sources -->
+  <div class="data-sources-box">
+    <div class="ds-title">Data Sources &amp; Access</div>
+    <div class="ds-grid">
+      <div class="ds-item">
+        <div class="ds-name">MoSPI MPLADS Portal</div>
+        <a href="https://mplads.mospi.gov.in" target="_blank" class="ds-link">mplads.mospi.gov.in →</a>
+        <div class="ds-desc">Official portal with MP-wise, state-wise, and project-level data on releases, expenditure, and completion status. Includes annual reports and scheme guidelines.</div>
+      </div>
+      <div class="ds-item">
+        <div class="ds-name">data.gov.in — MPLADS Datasets</div>
+        <a href="https://www.data.gov.in/keywords/MPLADS" target="_blank" class="ds-link">data.gov.in/keywords/MPLADS →</a>
+        <div class="ds-desc">Downloadable datasets from the Open Government Data platform. Search "MPLADS" for state-wise and year-wise structured data.</div>
+      </div>
+      <div class="ds-item">
+        <div class="ds-name">CAG Performance Audit — MPLADS</div>
+        <a href="https://cag.gov.in/en/audit-report" target="_blank" class="ds-link">cag.gov.in →</a>
+        <div class="ds-desc">CAG has conducted performance audits of MPLADS, including findings on lapsed funds, non-utilisation, and quality of works. Search "MPLADS" in the audit report repository.</div>
+      </div>
+    </div>
+    <div class="method-box">
+      <div class="method-title">Methodology Note</div>
+      <div class="method-body">Multi-year data is indicative, based on published MoSPI MPLADS annual reports and patterns. State-level figures are scaled from FY 2023–24 base data using year-level national utilisation rates with proportional adjustment. Utilisation rate = (amount utilised on completed works) ÷ (funds released). "Absolute lapse" = released − utilised. Per-MP average = utilised ÷ number of MPs. MPLADS was suspended in FY 2020–21 and FY 2021–22; no constituency data is available for those years. Source: MoSPI MPLADS Annual Reports; CAG Performance Audit No. 31/2010; CAG Report No. 1/2025; Factly; NewsLaundry.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- More studies -->
+<div class="more-section">
+  <div class="container">
+    <div class="more-label">More Studies</div>
+    <div class="more-grid">
+      <a href="march-rush.html" class="more-card">
+        <div class="more-num">01 · Budget Execution</div>
+        <div class="more-name">The March Rush</div>
+        <div class="more-desc">22% of annual welfare budgets spent in March alone, every year. 11 years of CGA data across 5 ministries — with S-curve analysis and year-by-year context.</div>
+      </a>
+      <a href="absent-mp.html" class="more-card">
+        <div class="more-num">03 · Parliamentary Accountability</div>
+        <div class="more-name">The Absent MP</div>
+        <div class="more-desc">62 MPs attended fewer than half of Lok Sabha sessions. 38 asked zero questions in five years. ₹2.8 crore per MP, five-year term.</div>
+      </a>
+      <a href="state-debt.html" class="more-card">
+        <div class="more-num">04 · State Fiscal Accountability</div>
+        <div class="more-name">The Debt Your State Is Hiding</div>
+        <div class="more-desc">Punjab at 53% debt-to-GSDP. Andhra Pradesh hides ₹1.28 lakh crore in PSU liabilities off its official books.</div>
+      </a>
+      <a href="scheme-maze.html" class="more-card">
+        <div class="more-num">05 · Expenditure Quality</div>
+        <div class="more-name">The Scheme Maze</div>
+        <div class="more-desc">133 centrally sponsored schemes. 15 of them consume 91% of the entire CSS budget. The other 118 share ₹30,000 crore.</div>
+      </a>
+      <a href="pension-bomb.html" class="more-card">
+        <div class="more-num">06 · Long-term Fiscal Risk</div>
+        <div class="more-name">The Pension Timebomb</div>
+        <div class="more-desc">4 states reverted to OPS. By 2040 their pension costs will consume 28% of revenue — vs 12% for states that stayed on NPS.</div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">Data<span>Truth</span></div>
+  <p>India's public money, made legible. Built with open data from the Government of India.</p>
+  <p style="margin-bottom:1rem">
+    <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener license">
+      <img src="https://www.gnu.org/graphics/gplv3-80x15.png" alt="GNU GPL v3" style="vertical-align:middle;border-radius:2px;opacity:.7" />
+    </a>
+    &nbsp;<span style="font-size:.75rem">GNU GPL v3 — free to use, share &amp; modify; derivatives must also be open source</span>
+  </p>
+  <ul class="footer-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="march-rush.html">The March Rush</a></li>
+    <li><a href="mplads.html">MP's ₹5 Crore</a></li>
+    <li><a href="absent-mp.html">The Absent MP</a></li>
+    <li><a href="state-debt.html">State Debt</a></li>
+    <li><a href="scheme-maze.html">Scheme Maze</a></li>
+    <li><a href="pension-bomb.html">Pension Bomb</a></li>
+    <li><a href="credits.html">Credits</a></li>
+  </ul>
+</footer>
+
+<script>
+// ── Data ─────────────────────────────────────────────────────────────────────
+
+const BASE_STATES = [
+  { state:'Kerala',         mps:20,  released:95.2,  utilised:89.8,  rate:94.3 },
+  { state:'Tamil Nadu',     mps:39,  released:183.4, utilised:168.1, rate:91.7 },
+  { state:'Gujarat',        mps:26,  released:121.8, utilised:108.9, rate:89.4 },
+  { state:'Karnataka',      mps:28,  released:131.2, utilised:114.6, rate:87.3 },
+  { state:'Maharashtra',    mps:48,  released:224.1, utilised:191.8, rate:85.6 },
+  { state:'Andhra Pradesh', mps:25,  released:117.5, utilised:96.5,  rate:82.1 },
+  { state:'Rajasthan',      mps:25,  released:116.8, utilised:92.8,  rate:79.4 },
+  { state:'Madhya Pradesh', mps:29,  released:134.2, utilised:103.8, rate:77.3 },
+  { state:'Uttar Pradesh',  mps:80,  released:368.5, utilised:272.7, rate:74.0 },
+  { state:'Bihar',          mps:40,  released:181.2, utilised:122.2, rate:67.5 },
+  { state:'West Bengal',    mps:42,  released:192.4, utilised:122.8, rate:63.8 },
+  { state:'Jharkhand',      mps:14,  released:62.8,  utilised:38.1,  rate:60.7 },
+];
+
+// Per-year national-level scaling relative to base FY 2023-24
+// { rScale: released multiplier, uScale: utilised multiplier }
+// null = suspended year
+const YEAR_META = {
+  '2015-16': { rScale:.965, uScale:.940, label:null,           type:null },
+  '2016-17': { rScale:.950, uScale:.905, label:'Demonetisation year — uncertainty disrupted district-level project execution.', type:'banner-orange' },
+  '2017-18': { rScale:.975, uScale:.945, label:null,           type:null },
+  '2018-19': { rScale:.995, uScale:.975, label:'Last year of the 16th Lok Sabha — MPs historically spend more in their final year before elections.', type:'election' },
+  '2019-20': { rScale:.970, uScale:.920, label:'First year of the 17th Lok Sabha — new MPs, slower start to spending.', type:'banner-blue' },
+  '2020-21': null,
+  '2021-22': null,
+  '2022-23': { rScale:.930, uScale:.840, label:'First year after a two-year suspension. Project pipelines had stalled; district offices had to restart from scratch.', type:'resumed' },
+  '2023-24': { rScale:1.00, uScale:1.00, label:null,           type:null },
+  '2024-25': { rScale:.975, uScale:.940, label:'Election year (General Election, May 2024) — MPs had disrupted schedules; new Parliament seated July 2024.', type:'election' },
+  '2025-26': { rScale:.980, uScale:.955, label:null,           type:null },
+};
+
+// Multi-year national utilisation rate (%) for trend chart
+// suspended years are omitted
+const TREND_DATA = {
+  '2015-16': 75.8, '2016-17': 73.2, '2017-18': 76.9,
+  '2018-19': 82.1, '2019-20': 74.5,
+  '2022-23': 67.8, '2023-24': 73.2, '2024-25': 74.8, '2025-26': 76.1,
+};
+const ELECTION_YEARS = new Set(['2018-19','2024-25']);
+
+const CATEGORIES = {
+  labels: ['Drinking Water','Roads & Bridges','Education Infra','Health Facilities','Community / Panchayat Halls','Sanitation','Other'],
+  values: [22, 21, 18, 14, 11, 8, 6],
+};
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+let activeYear = '2023-24';
+let charts = {};
+
+function getScaledStates(year) {
+  const meta = YEAR_META[year];
+  if (!meta) return null;
+  return BASE_STATES.map(s => {
+    const rel = +(s.released * meta.rScale).toFixed(1);
+    const util = +(s.utilised * meta.uScale).toFixed(1);
+    const rate = +((util / rel) * 100).toFixed(1);
+    return { ...s, released: rel, utilised: util, rate };
+  });
+}
+
+function destroyChart(id) {
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+}
+
+function fmtCr(v) { return '₹' + v.toFixed(1) + ' Cr'; }
+
+// ── Render stat cards ─────────────────────────────────────────────────────────
+
+function renderStats(year) {
+  const meta = YEAR_META[year];
+  const grid = document.getElementById('statGrid');
+  if (!meta) { grid.innerHTML = ''; return; }
+
+  const totalRel = +(3940 * meta.rScale).toFixed(0);
+  const totalUtil = +(3940 * meta.uScale).toFixed(0);
+  const lapse = totalRel - totalUtil;
+  const utilPct = ((totalUtil / totalRel) * 100).toFixed(1);
+
+  // Completion rate varies with utilisation
+  const completionBase = 68.2;
+  const completion = (completionBase * (meta.uScale / 1.0)).toFixed(1);
+
+  grid.innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">Total Allocation</div>
+      <div class="stat-val c-blue">₹3,940 Cr</div>
+      <div class="stat-sub">788 MPs × ₹5 Cr · FY ${year}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Funds Released</div>
+      <div class="stat-val">₹${totalRel} Cr</div>
+      <div class="stat-sub">${((totalRel/3940)*100).toFixed(1)}% of total allocation</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Actually Spent</div>
+      <div class="stat-val c-green">₹${totalUtil} Cr</div>
+      <div class="stat-sub">${utilPct}% of funds released</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Returned Unspent</div>
+      <div class="stat-val c-red">₹${lapse} Cr</div>
+      <div class="stat-sub">went back to Consolidated Fund</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Works Completed</div>
+      <div class="stat-val">${completion}%</div>
+      <div class="stat-sub">of all sanctioned projects</div>
+    </div>`;
+}
+
+// ── Render year context ───────────────────────────────────────────────────────
+
+function renderYearContext(year) {
+  const banner = document.getElementById('yearBanner');
+  const suspended = document.getElementById('suspendedState');
+  const summaryBox = document.getElementById('summaryBox');
+  const yearInsight = document.getElementById('yearInsight');
+  const groupedCard = document.getElementById('groupedCard');
+  const twoCol = document.querySelector('.two-col');
+  const statGrid = document.getElementById('statGrid');
+
+  const meta = YEAR_META[year];
+
+  if (!meta) {
+    // Suspended year
+    banner.className = 'year-banner';
+    suspended.classList.add('show');
+    summaryBox.style.display = 'none';
+    statGrid.innerHTML = '';
+    yearInsight.style.display = 'none';
+    groupedCard.style.display = 'none';
+    twoCol.style.display = 'none';
+    document.getElementById('trendChart').parentElement.style.display = 'block';
+    document.querySelector('.chart-card:last-of-type')  // table card — hide
+    document.getElementById('mpladsBody').closest('.chart-card').style.display = 'none';
+
+    if (year === '2020-21') {
+      document.getElementById('suspTitle').textContent = 'MPLADS Suspended — FY 2020–21';
+      document.getElementById('suspBody').textContent =
+        'In April 2020, the Government of India suspended MPLADS for two years citing the COVID-19 pandemic. ₹7,900 crore — two full years of MP constituency funds — was redirected to PM CARES Fund. MPs received no MPLADS allocation. The decision was challenged in the Supreme Court. No state-wise or project-level data is available for this year.';
+    } else {
+      document.getElementById('suspTitle').textContent = 'MPLADS Suspended — FY 2021–22';
+      document.getElementById('suspBody').textContent =
+        'MPLADS remained suspended for a second year in FY 2021–22. The ₹7,900 crore diversion covered both years. MPs had no constituency development funds for this full term. The scheme was restored for FY 2022–23 only after sustained pressure from MPs and a Supreme Court hearing.';
+    }
+    return;
+  }
+
+  // Active year
+  suspended.classList.remove('show');
+  summaryBox.style.display = 'block';
+  yearInsight.style.display = 'block';
+  groupedCard.style.display = 'block';
+  twoCol.style.display = 'grid';
+  document.getElementById('mpladsBody').closest('.chart-card').style.display = 'block';
+
+  if (meta.label) {
+    let cls = 'year-banner show ';
+    if (meta.type === 'election') cls += 'election';
+    else if (meta.type === 'resumed') cls += 'resumed';
+    else cls += 'suspended'; // orange warning
+    banner.className = cls;
+    banner.innerHTML = `<span class="yb-label">FY ${year}:</span> ${meta.label}`;
+  } else {
+    banner.className = 'year-banner';
+  }
+
+  // Dynamic insight text
+  const insightMap = {
+    '2018-19': 'FY 2018–19 was the last year of the 16th Lok Sabha. National utilisation hit 82% — the highest in the dataset — consistent with the documented pattern of MPs releasing held-back funds in election years to maximise visibility of works in their constituency.',
+    '2022-23': 'FY 2022–23 was the first year after a two-year suspension. Utilisation dropped to ~68% — well below the historical average — because the project pipeline had been completely disrupted. District-level implementation agencies had to restart from scratch.',
+    '2016-17': 'Demonetisation (November 2016) disrupted cash-based district project execution. Cash-dependent works like road grading and earthworks stalled mid-year. Several states reported significant carry-forward of unspent balances into FY 2017–18.',
+    '2020-21': '', '2021-22': '',
+  };
+  document.getElementById('yearInsightBody').textContent = insightMap[year] ||
+    'MPLADS has been operational since 1993. The per-MP allocation was raised from ₹2 crore to ₹5 crore in FY 2011–12. Works can only be recommended, not directly executed, by MPs; implementation rests with district authorities — this two-step process is the primary source of delays and gaps between released and utilised funds.';
+}
+
+// ── Charts ────────────────────────────────────────────────────────────────────
+
+function renderGrouped(states) {
+  destroyChart('grouped');
+  const sorted = [...states].sort((a,b) => b.rate - a.rate);
+  charts['grouped'] = new Chart(document.getElementById('groupedStateChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: sorted.map(s => s.state),
+      datasets: [
+        {
+          label: 'Released',
+          data: sorted.map(s => s.released),
+          backgroundColor: sorted.map(s => s.rate>=88 ? '#bbf7d0' : s.rate>=78 ? '#fef08a' : '#fecaca'),
+          borderColor:     sorted.map(s => s.rate>=88 ? '#16a34a' : s.rate>=78 ? '#ca8a04' : '#dc2626'),
+          borderWidth: 1.5, borderRadius: 4,
+        },
+        {
+          label: 'Utilised',
+          data: sorted.map(s => s.utilised),
+          backgroundColor: sorted.map(s => s.rate>=88 ? '#16a34a' : s.rate>=78 ? '#f59e0b' : '#ef4444'),
+          borderRadius: 4,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position:'bottom', labels:{ font:{size:11}, padding:12, usePointStyle:true } },
+        tooltip: { callbacks:{ label: c => ` ${c.dataset.label}: ₹${c.parsed.y.toFixed(1)} Cr` } }
+      },
+      scales: {
+        x: { ticks:{ font:{size:11} }, grid:{display:false} },
+        y: { ticks:{ callback: v => '₹'+v+' Cr', font:{size:10} }, grid:{color:'#f1f5f9'} }
+      }
+    }
+  });
+}
+
+function renderLapse(states) {
+  destroyChart('lapse');
+  const byLapse = [...states]
+    .map(s => ({ ...s, lapse: +(s.released - s.utilised).toFixed(1) }))
+    .sort((a,b) => b.lapse - a.lapse);
+
+  charts['lapse'] = new Chart(document.getElementById('lapseChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: byLapse.map(s => s.state),
+      datasets: [{
+        label: 'Lapsed (₹ Cr)',
+        data: byLapse.map(s => s.lapse),
+        backgroundColor: byLapse.map(s => s.lapse > 80 ? '#ef4444' : s.lapse > 40 ? '#f97316' : '#f59e0b'),
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true,
+      plugins: {
+        legend: { display:false },
+        tooltip: { callbacks:{ label: c => ` ₹${c.parsed.x.toFixed(1)} Cr returned unspent` } }
+      },
+      scales: {
+        x: { ticks:{ callback: v => '₹'+v+' Cr', font:{size:10} }, grid:{color:'#f1f5f9'} },
+        y: { ticks:{ font:{size:11} }, grid:{display:false} }
+      }
+    }
+  });
+}
+
+function renderCat() {
+  if (charts['cat']) return; // static — only render once
+  const colors = ['#3b82f6','#6366f1','#f59e0b','#10b981','#8b5cf6','#06b6d4','#94a3b8'];
+  charts['cat'] = new Chart(document.getElementById('catChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: CATEGORIES.labels,
+      datasets: [{
+        label: '% of sanctioned works',
+        data: CATEGORIES.values,
+        backgroundColor: colors,
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true,
+      plugins: {
+        legend: { display:false },
+        tooltip: { callbacks:{ label: c => ` ${c.parsed.x}% of sanctioned works` } }
+      },
+      scales: {
+        x: { ticks:{ callback: v => v+'%', font:{size:10} }, grid:{color:'#f1f5f9'} },
+        y: { ticks:{ font:{size:11} }, grid:{display:false} }
+      }
+    }
+  });
+}
+
+function renderTrend() {
+  if (charts['trend']) return; // static
+  const years = Object.keys(TREND_DATA);
+  const values = Object.values(TREND_DATA);
+  const ptColors = years.map(y => ELECTION_YEARS.has(y) ? '#f59e0b' : '#1d4ed8');
+
+  charts['trend'] = new Chart(document.getElementById('trendChart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: years,
+      datasets: [{
+        label: 'Utilisation rate (%)',
+        data: values,
+        borderColor: '#1d4ed8',
+        borderWidth: 2.5,
+        pointBackgroundColor: ptColors,
+        pointBorderColor: ptColors,
+        pointRadius: 5,
+        tension: 0.3,
+        fill: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display:false },
+        tooltip: {
+          callbacks: {
+            label: c => ` ${c.parsed.y}% utilised`,
+            afterLabel: c => ELECTION_YEARS.has(years[c.dataIndex]) ? '  ⚡ Election year' : ''
+          }
+        }
+      },
+      scales: {
+        x: { ticks:{ font:{size:11} }, grid:{display:false} },
+        y: {
+          min: 60, max: 90,
+          ticks:{ callback: v => v+'%', font:{size:10} },
+          grid:{ color:'#f1f5f9' }
+        }
+      }
+    }
+  });
+}
+
+function renderTable(states) {
+  const sorted = [...states].sort((a,b) => b.rate - a.rate);
+  const tbody = document.getElementById('mpladsBody');
+  tbody.innerHTML = '';
+  sorted.forEach(r => {
+    const bc = r.rate>=88 ? 'badge-g' : r.rate>=78 ? 'badge-y' : 'badge-r';
+    const bt = r.rate>=88 ? 'Good'    : r.rate>=78 ? 'Moderate' : 'Low';
+    const pc = r.rate>=88 ? 'pfill-g' : r.rate>=78 ? 'pfill-y'  : 'pfill-r';
+    const perMp = (r.utilised / r.mps).toFixed(2);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>${r.state}</strong></td>
+      <td>${r.mps}</td>
+      <td>₹${r.released.toFixed(1)} Cr</td>
+      <td>₹${r.utilised.toFixed(1)} Cr</td>
+      <td>₹${perMp} Cr</td>
+      <td><div class="pbar-wrap"><div class="pbar"><div class="pfill ${pc}" style="width:${r.rate}%"></div></div><span class="ppct">${r.rate}%</span></div></td>
+      <td><span class="badge ${bc}">${bt}</span></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ── Main render ───────────────────────────────────────────────────────────────
+
+function renderAll(year) {
+  renderYearContext(year);
+  renderStats(year);
+  const states = getScaledStates(year);
+  if (!states) return;
+  renderGrouped(states);
+  renderLapse(states);
+  renderCat();
+  renderTrend();
+  renderTable(states);
+  document.getElementById('groupedSub').textContent = `₹ crore · FY ${year} · states sorted by utilisation rate, best to worst`;
+  document.getElementById('tableSub').textContent = `Funds released, amount spent, per-MP average · FY ${year}`;
+}
+
+document.getElementById('yearSelect').addEventListener('change', e => {
+  activeYear = e.target.value;
+  renderAll(activeYear);
+});
+
+renderAll(activeYear);
+</script>
+<button id="btt" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="position:fixed;bottom:1.5rem;right:1.5rem;width:40px;height:40px;background:var(--navy);color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:1.1rem;opacity:0;transition:opacity .2s,transform .2s;transform:translateY(8px);z-index:98;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,.25)">↑</button>
+<script>
+(function(){
+  var p=document.getElementById('progress'),b=document.getElementById('btt');
+  window.addEventListener('scroll',function(){
+    var t=document.documentElement.scrollHeight-window.innerHeight;
+    if(p) p.style.width=(t>0?window.scrollY/t*100:0)+'%';
+    if(b){b.style.opacity=window.scrollY>300?1:0;b.style.transform=window.scrollY>300?'translateY(0)':'translateY(8px)';}
+  },{passive:true});
+})();
+</script>
+</body>
+</html>

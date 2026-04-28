@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Scheme Maze — DataTruth</title>
+  <meta name="description" content="India runs 133 centrally sponsored schemes. 15 of them consume 91% of the budget. The remaining 118 schemes share just ₹30,000 crore — creating an administrative fog where accountability vanishes." />
+  <meta property="og:title" content="The Scheme Maze — DataTruth" />
+  <meta property="og:description" content="133 CSS schemes. 15 get 91% of the budget. The other 118 share ₹30,000 crore between them." />
+  <meta property="og:type" content="article" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --navy:#0f172a; --blue:#1d4ed8; --red:#dc2626; --orange:#ea580c;
+      --green:#16a34a; --bg:#f8fafc; --card:#ffffff; --border:#e2e8f0;
+      --txt:#0f172a; --txt2:#475569; --txt3:#94a3b8;
+    }
+    html { scroll-behavior:smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--txt); line-height:1.6; font-size:16px; }
+    nav { background:var(--navy); padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; gap:1rem; }
+    .logo { font-family:'Playfair Display',serif; font-size:1.4rem; color:#fff; text-decoration:none; white-space:nowrap; }
+    .logo span { color:#ef4444; }
+    .nav-links { display:flex; gap:1.5rem; list-style:none; flex-wrap:wrap; }
+    .nav-links a { color:#94a3b8; text-decoration:none; font-size:.875rem; font-weight:500; transition:color .15s; }
+    .nav-links a.active { color:#fff; }
+    .nav-links a:hover { color:#fff; }
+    .study-hero { background:var(--navy); color:#fff; padding:3.5rem 2rem 3rem; }
+    .container { max-width:1080px; margin:0 auto; padding:0 2rem; }
+    .breadcrumb { font-size:.8rem; color:#64748b; margin-bottom:1.5rem; }
+    .breadcrumb a { color:#64748b; text-decoration:none; }
+    .breadcrumb a:hover { color:#94a3b8; }
+    .study-tag { font-size:.68rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#f87171; margin-bottom:.875rem; }
+    .study-hero h1 { font-family:'Playfair Display',serif; font-size:clamp(2rem,4vw,3rem); line-height:1.15; margin-bottom:1rem; }
+    .study-hero-desc { font-size:1rem; color:#94a3b8; max-width:640px; line-height:1.8; margin-bottom:1.25rem; }
+    .analogy-pill { display:inline-flex; align-items:center; gap:.5rem; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); color:#cbd5e1; font-size:.875rem; line-height:1.5; padding:.625rem 1rem; border-radius:8px; max-width:620px; }
+    .analogy-pill strong { color:#fff; }
+    .notice { background:#fef9c3; border-bottom:1px solid #fde047; padding:.65rem 2rem; text-align:center; font-size:.8rem; color:#713f12; }
+    .page-body { padding:3.5rem 0 5rem; }
+    .summary-box { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-bottom:2rem; display:flex; gap:1.25rem; align-items:flex-start; }
+    .summary-icon { width:36px; height:36px; border-radius:8px; background:#fef2f2; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
+    .summary-title { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--red); margin-bottom:.625rem; }
+    .summary-list { list-style:none; display:flex; flex-direction:column; gap:.5rem; }
+    .summary-list li { font-size:.9375rem; color:var(--txt2); padding-left:1.25rem; position:relative; line-height:1.6; }
+    .summary-list li::before { content:''; position:absolute; left:0; top:.6em; width:6px; height:6px; border-radius:50%; background:var(--red); }
+    .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:1rem; margin-bottom:2rem; }
+    .stat-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.25rem 1.375rem; }
+    .stat-label { font-size:.72rem; font-weight:600; color:var(--txt3); margin-bottom:.35rem; line-height:1.3; }
+    .stat-val { font-size:1.875rem; font-weight:700; line-height:1; margin-bottom:.3rem; }
+    .stat-sub { font-size:.78rem; color:var(--txt2); line-height:1.4; }
+    .c-red { color:var(--red); } .c-blue { color:var(--blue); } .c-orange { color:var(--orange); } .c-green { color:var(--green); }
+    .chart-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; }
+    .chart-head { margin-bottom:.75rem; }
+    .chart-title { font-size:1rem; font-weight:600; color:var(--txt); }
+    .chart-sub { font-size:.8rem; color:var(--txt2); margin-top:.2rem; line-height:1.5; }
+    .chart-hint { display:flex; align-items:flex-start; gap:.5rem; background:#f8fafc; border-radius:6px; padding:.625rem .875rem; margin-bottom:1.25rem; }
+    .hint-text { font-size:.8rem; color:var(--txt2); line-height:1.55; }
+    .legend-row { display:flex; flex-wrap:wrap; gap:1rem; margin-bottom:1.25rem; }
+    .legend-item { display:flex; align-items:center; gap:.375rem; font-size:.78rem; color:var(--txt2); }
+    .legend-dot { width:10px; height:10px; border-radius:2px; flex-shrink:0; }
+    .insight { background:#fef2f2; border:1.5px solid #fecaca; border-left:4px solid var(--red); border-radius:8px; padding:1.25rem 1.5rem; margin-bottom:1.5rem; }
+    .insight-tag { font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--red); margin-bottom:.5rem; }
+    .insight-body { font-size:.9375rem; color:#7f1d1d; line-height:1.7; }
+    .two-col { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+    .section-tag { font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--red); margin-bottom:.75rem; }
+    .section-title { font-family:'Playfair Display',serif; font-size:clamp(1.5rem,2.5vw,2rem); line-height:1.2; margin-bottom:.75rem; }
+    .section-body { font-size:.9375rem; color:var(--txt2); line-height:1.75; margin-bottom:1.75rem; max-width:660px; }
+    .incidents-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.25rem; margin-bottom:2rem; }
+    .incident-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; position:relative; overflow:hidden; }
+    .incident-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+    .incident-card.red::before { background:var(--red); }
+    .incident-card.orange::before { background:var(--orange); }
+    .incident-card.blue::before { background:var(--blue); }
+    .inc-type { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; margin-bottom:.625rem; }
+    .incident-card.red .inc-type { color:var(--red); }
+    .incident-card.orange .inc-type { color:var(--orange); }
+    .incident-card.blue .inc-type { color:var(--blue); }
+    .inc-title { font-size:.9375rem; font-weight:700; line-height:1.3; margin-bottom:.5rem; color:var(--txt); }
+    .inc-body { font-size:.8375rem; color:var(--txt2); line-height:1.65; margin-bottom:.875rem; }
+    .inc-source { font-size:.75rem; color:var(--txt3); border-top:1px solid var(--border); padding-top:.625rem; }
+    .ds-box { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; }
+    .ds-head { font-size:.9375rem; font-weight:600; margin-bottom:1.125rem; }
+    .ds-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1rem; }
+    .ds-item { padding:1rem; background:var(--bg); border-radius:8px; border:1px solid var(--border); }
+    .ds-name { font-size:.8125rem; font-weight:600; margin-bottom:.25rem; }
+    .ds-link { display:block; font-size:.78rem; color:var(--blue); text-decoration:none; margin-bottom:.35rem; }
+    .ds-link:hover { text-decoration:underline; }
+    .ds-desc { font-size:.78rem; color:var(--txt2); line-height:1.55; }
+    .method-box { background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:1.25rem 1.5rem; margin-top:1.25rem; }
+    .method-title { font-size:.75rem; font-weight:700; color:#92400e; text-transform:uppercase; letter-spacing:.08em; margin-bottom:.4rem; }
+    .method-body { font-size:.8125rem; color:#78350f; line-height:1.65; }
+    .more-section { background:var(--navy); padding:3rem 0; }
+    .more-label { font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#475569; margin-bottom:1.25rem; }
+    .more-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1rem; }
+    .more-card { display:block; text-decoration:none; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:1.5rem; transition:all .15s; }
+    .more-card:hover { background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.2); }
+    .more-num { font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#475569; margin-bottom:.5rem; }
+    .more-name { font-size:1.125rem; font-weight:600; color:#fff; margin-bottom:.4rem; }
+    .more-desc { font-size:.8rem; color:#64748b; line-height:1.55; }
+    footer { background:var(--navy); border-top:1px solid #1e293b; color:#64748b; padding:2.5rem 2rem; text-align:center; }
+    .footer-logo { font-family:'Playfair Display',serif; font-size:1.125rem; color:#fff; margin-bottom:.625rem; }
+    .footer-logo span { color:#ef4444; }
+    footer p { font-size:.8125rem; max-width:420px; margin:0 auto 1.25rem; line-height:1.65; }
+    .footer-links { display:flex; gap:1.5rem; justify-content:center; list-style:none; flex-wrap:wrap; }
+    .footer-links a { color:#475569; text-decoration:none; font-size:.8rem; transition:color .15s; }
+    .footer-links a:hover { color:#fff; }
+    @media (max-width:700px) { nav { flex-wrap:wrap; } .two-col { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+<div id="progress" style="position:fixed;top:0;left:0;height:3px;background:#dc2626;z-index:200;width:0%;pointer-events:none;transition:width 80ms linear"></div>
+
+<nav>
+  <a href="index.html" class="logo">Data<span>Truth</span></a>
+  <ul class="nav-links">
+    <li><a href="march-rush.html">The March Rush</a></li>
+    <li><a href="mplads.html">MP's ₹5 Crore</a></li>
+    <li><a href="absent-mp.html">The Absent MP</a></li>
+    <li><a href="state-debt.html">State Debt</a></li>
+    <li><a href="scheme-maze.html" class="active">Scheme Maze</a></li>
+    <li><a href="pension-bomb.html">Pension Bomb</a></li>
+  </ul>
+</nav>
+
+<div class="notice">📊 Showing indicative data based on Union Budget Statement 16 and NIPFP/data.gov.in CSS records · FY 2024–25</div>
+
+<div class="study-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">← DataTruth</a> / The Scheme Maze</div>
+    <div class="study-tag">05 · Public Expenditure Quality</div>
+    <h1>The Scheme Maze</h1>
+    <p class="study-hero-desc">India runs 130+ Centrally Sponsored Schemes — government programmes funded by both Centre and states. The government has tried to rationalise them three times. Each time, the count crept back. Today, 15 schemes consume 91% of the budget while 115 schemes fight over the remaining 9%.</p>
+    <div class="analogy-pill">
+      <span>💡</span>
+      <span><strong>Imagine hiring 130 project managers for your office,</strong> but giving 15 of them 91% of the budget and telling the other 115 to "figure it out" with ₹9,000 each.</span>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+<div class="container">
+
+  <div class="summary-box">
+    <div class="summary-icon">⚠️</div>
+    <div>
+      <div class="summary-title">The short version</div>
+      <ul class="summary-list">
+        <li>India runs 133 centrally sponsored schemes. The government has rationalised them three times since 2000, cutting the number each time — but the count bounces back within 3–4 years.</li>
+        <li>15 schemes receive 91% of all CSS funding. The remaining 115 schemes share 9% — an average of under ₹300 crore each, often too small to have dedicated implementation staff at the district level.</li>
+        <li>States with weak implementation capacity consistently under-utilise CSS funds: Jharkhand, Bihar, and UP return 30–40% of transfers unspent, even while citizens in those states need the services most.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Active CSS Schemes</div><div class="stat-val c-blue">133</div><div class="stat-sub">Centrally Sponsored Schemes as of FY 2024–25</div></div>
+    <div class="stat-card"><div class="stat-label">Budget Concentration</div><div class="stat-val c-orange">91%</div><div class="stat-sub">of CSS outlay goes to just 15 schemes</div></div>
+    <div class="stat-card"><div class="stat-label">Rationalisation Attempts</div><div class="stat-val c-red">3 times</div><div class="stat-sub">2001, 2013, 2016 — count crept back each time</div></div>
+    <div class="stat-card"><div class="stat-label">Avg Remaining Scheme</div><div class="stat-val c-red">₹268 Cr</div><div class="stat-sub">per year for the 115 smaller schemes (national)</div></div>
+    <div class="stat-card"><div class="stat-label">Worst State Utilisation</div><div class="stat-val c-red">58%</div><div class="stat-sub">Jharkhand CSS utilisation · FY 2023–24</div></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-head">
+      <div class="chart-title">15 schemes, 91% of the money</div>
+      <div class="chart-sub">CSS outlay by scheme · FY 2024–25 · ₹ crore · all 115 other schemes are grouped at the bottom</div>
+    </div>
+    <div class="chart-hint">
+      <span>ℹ</span>
+      <span class="hint-text"><strong>How to read this:</strong> Each bar is one scheme's annual budget. The grey bar at the bottom shows the combined budget for ALL other 115 schemes. Notice it's smaller than MGNREGS alone.</span>
+    </div>
+    <div style="position:relative;height:560px"><canvas id="chart1"></canvas></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-head">
+      <div class="chart-title">The rationalisation that never sticks</div>
+      <div class="chart-sub">Number of active Centrally Sponsored Schemes · 2001 to 2024–25</div>
+    </div>
+    <div class="chart-hint">
+      <span>ℹ</span>
+      <span class="hint-text"><strong>How to read this:</strong> Every time the government cuts schemes, the number bounces back. The 2016 exercise cut from 147 to 66 — the green bar. By 2024 the count was back to 133.</span>
+    </div>
+    <div class="legend-row">
+      <div class="legend-item"><div class="legend-dot" style="background:#16a34a"></div>2016 Reform Year</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#1d4ed8"></div>Other Years</div>
+    </div>
+    <div style="position:relative;height:300px"><canvas id="chart2"></canvas></div>
+  </div>
+
+  <div class="insight">
+    <div class="insight-tag">Key Insight</div>
+    <div class="insight-body">The 2016 rationalisation cut schemes from 147 to 66 — celebrated as a structural reform. Within 8 years, the count rose to 133: almost back to the pre-reform level. New schemes are added through budget announcements as political signals, while old schemes are never retired based on performance. The government has no statutory mechanism to sunset schemes that fail evaluation.</div>
+  </div>
+
+  <div class="two-col">
+    <div class="chart-card" style="margin-bottom:0">
+      <div class="chart-head">
+        <div class="chart-title">The states that need schemes most use them least</div>
+        <div class="chart-sub">Average CSS fund utilisation · FY 2023–24 · higher is better</div>
+      </div>
+      <div class="chart-hint">
+        <span>ℹ</span>
+        <span class="hint-text"><strong>How to read this:</strong> % of CSS money transferred to states that was actually spent. States at the bottom consistently return funds unspent due to limited administrative capacity.</span>
+      </div>
+      <div style="position:relative;height:420px"><canvas id="chart3"></canvas></div>
+    </div>
+    <div class="chart-card" style="margin-bottom:0">
+      <div class="chart-head">
+        <div class="chart-title">Multiple schemes, same job: agriculture sector</div>
+        <div class="chart-sub">Active CSS schemes in agriculture · annual budgets · FY 2024–25</div>
+      </div>
+      <div class="chart-hint">
+        <span>ℹ</span>
+        <span class="hint-text"><strong>How to read this:</strong> All 6 schemes address farm income, crop risk, or soil health — overlapping mandates. A farmer in Bihar may be eligible for all 6, but district offices manage separate paperwork for each.</span>
+      </div>
+      <div style="position:relative;height:420px"><canvas id="chart4"></canvas></div>
+    </div>
+  </div>
+
+  <div style="margin-top:1.5rem">
+    <div class="section-tag">Case Studies</div>
+    <h2 class="section-title">The cost of too many schemes, too few hands</h2>
+    <p class="section-body">Behind the budget numbers are concrete failures: rationalised scheme counts bouncing back, district offices paralysed by competing reporting requirements, achievement figures double-counted across databases, and two central programmes competing for the same rural labour pool.</p>
+  </div>
+
+  <div class="incidents-grid">
+    <div class="incident-card red">
+      <div class="inc-type">Rationalisation Failure · 2016–2024</div>
+      <div class="inc-title">The government cut 147 schemes to 66 in 2016. By 2024 the count was back to 133.</div>
+      <div class="inc-body">In 2015–16, the Finance Ministry pruned CSS from 147 to 66, collapsing overlapping schemes under umbrella heads. By FY 2020–21, the count had risen to 116. By FY 2024–25, it reached 133. New schemes are added with each budget — to announce policy priorities, satisfy coalition partners, or respond to crises — without removing old ones whose mandates overlap. No scheme has ever been retired based on performance evaluation alone.</div>
+      <div class="inc-source">Source: NIPFP Working Paper — "Centrally Sponsored Schemes: Past Trends and Way Forward" (2021); Union Budget documents</div>
+    </div>
+    <div class="incident-card orange">
+      <div class="inc-type">Capacity Mismatch · Bihar, Jharkhand</div>
+      <div class="inc-title">The district agriculture office in Gaya handles paperwork for 18 CSS sub-schemes simultaneously</div>
+      <div class="inc-body">District-level staff — block development officers, agriculture extension workers — are the common resource shared across all CSS schemes. In Gaya, Bihar, a single office handles 6 overlapping agriculture sub-schemes, each with separate reporting formats, separate fund flows, and separate monitoring portals. Staff spend more time filing MIS reports than providing field support. Bihar's agriculture sector utilisation rate clusters around 55–65% every year — not because the need isn't there, but because the pipeline is clogged.</div>
+      <div class="inc-source">Source: NITI Aayog DMEO reports; Bihar state budget reviews</div>
+    </div>
+    <div class="incident-card blue">
+      <div class="inc-type">Double Counting · NIPFP 2021</div>
+      <div class="inc-title">At least 28 CSS schemes report achievements that are also counted by other schemes</div>
+      <div class="inc-body">A 2021 NIPFP analysis found 28 CSS schemes where output indicators overlap with at least one other scheme. The clearest example: houses built under PM Awas Yojana Rural and Urban are counted separately, but in peri-urban areas the same dwelling is sometimes reported under both schemes. This inflates national achievement figures and makes independent outcome auditing impossible.</div>
+      <div class="inc-source">Source: NIPFP Working Paper No. 346/2021 — "CSS Rationalisation: Issues and Way Forward"</div>
+    </div>
+    <div class="incident-card orange">
+      <div class="inc-type">Implementation Paradox · MGNREGS vs PMGSY</div>
+      <div class="inc-title">Two central schemes competing for the same labour in the same village</div>
+      <div class="inc-body">MGNREGS guarantees 100 days of employment at minimum wage on local public works. PMGSY (rural roads) hires private contractors. In several states, PMGSY contractors report difficulty hiring labour because MGNREGS wage rates are comparable. During 2021–22, both schemes injected large sums simultaneously into rural Bihar and UP, causing local wage inflation that raised construction costs for PMGSY and reduced MGNREGS work-completion rates. The two schemes, designed by different ministries, were never co-ordinated.</div>
+      <div class="inc-source">Source: Ministry of Rural Development Annual Report; CAG Performance Audit on PMGSY (2022); NIPFP analysis</div>
+    </div>
+  </div>
+
+  <div class="ds-box">
+    <div class="ds-head">Data Sources &amp; Methodology</div>
+    <div class="ds-grid">
+      <div class="ds-item"><div class="ds-name">Union Budget — Statement 16</div><a href="https://indiabudget.gov.in" target="_blank" class="ds-link">indiabudget.gov.in →</a><div class="ds-desc">Detailed CSS scheme-wise outlay for each financial year. Available as downloadable Excel.</div></div>
+      <div class="ds-item"><div class="ds-name">data.gov.in — CSS Transfers</div><a href="https://www.data.gov.in/keywords/centrally-sponsored" target="_blank" class="ds-link">data.gov.in/keywords/centrally-sponsored →</a><div class="ds-desc">State-wise CSS fund releases and utilisation data by scheme.</div></div>
+      <div class="ds-item"><div class="ds-name">NIPFP Research Papers</div><a href="https://nipfp.org.in" target="_blank" class="ds-link">nipfp.org.in →</a><div class="ds-desc">Research papers on CSS rationalisation, scheme overlap, and fiscal federalism.</div></div>
+      <div class="ds-item"><div class="ds-name">NITI Aayog DMEO</div><a href="https://niti.gov.in/dmeo" target="_blank" class="ds-link">niti.gov.in/dmeo →</a><div class="ds-desc">Development Monitoring and Evaluation Office scheme performance reports.</div></div>
+    </div>
+    <div class="method-box">
+      <div class="method-title">Methodology Note</div>
+      <div class="method-body">CSS budget figures are from Union Budget Statement 16 (FY 2024–25). Scheme count history is indicative based on Finance Ministry and NIPFP compiled records. State utilisation data is based on data.gov.in CSS transfer records. "Utilisation rate" = funds spent ÷ total funds transferred to state. Agriculture sector chart represents central-share CSS schemes in agriculture and allied sector only. All figures are indicative.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="more-section">
+  <div class="container">
+    <div class="more-label">More Studies</div>
+    <div class="more-grid">
+      <a href="march-rush.html" class="more-card"><div class="more-num">01 · Budget Execution</div><div class="more-name">The March Rush</div><div class="more-desc">22% of annual welfare budgets spent in March alone, every year. 11 years of data across 5 ministries.</div></a>
+      <a href="mplads.html" class="more-card"><div class="more-num">02 · Parliamentary Accountability</div><div class="more-name">Your MP's ₹5 Crore</div><div class="more-desc">₹528 crore lapsed unspent in FY 2023–24. Year-wise MPLADS data from 2015–16 to 2025–26.</div></a>
+      <a href="absent-mp.html" class="more-card"><div class="more-num">03 · Parliamentary Accountability</div><div class="more-name">The Absent MP</div><div class="more-desc">62 MPs attended fewer than half the sessions. 38 asked zero questions in five years.</div></a>
+      <a href="state-debt.html" class="more-card"><div class="more-num">04 · State Fiscal Accountability</div><div class="more-name">The Debt Your State Is Hiding</div><div class="more-desc">Punjab at 53% debt-to-GSDP. AP hides ₹1.28 lakh crore off its official books.</div></a>
+      <a href="pension-bomb.html" class="more-card"><div class="more-num">06 · Long-term Fiscal Risk</div><div class="more-name">The Pension Timebomb</div><div class="more-desc">4 states reverted to OPS. By 2040, pension costs will consume 28% of their revenue receipts.</div></a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">Data<span>Truth</span></div>
+  <p>India's public money, made legible. Built with open data from the Government of India.</p>
+  <p style="margin-bottom:1rem">
+    <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener license">
+      <img src="https://www.gnu.org/graphics/gplv3-80x15.png" alt="GNU GPL v3" style="vertical-align:middle;border-radius:2px;opacity:.7" />
+    </a>
+    &nbsp;<span style="font-size:.75rem">GNU GPL v3 — free to use, share &amp; modify; derivatives must also be open source</span>
+  </p>
+  <ul class="footer-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="march-rush.html">The March Rush</a></li>
+    <li><a href="mplads.html">MP's ₹5 Crore</a></li>
+    <li><a href="absent-mp.html">The Absent MP</a></li>
+    <li><a href="state-debt.html">State Debt</a></li>
+    <li><a href="scheme-maze.html">Scheme Maze</a></li>
+    <li><a href="pension-bomb.html">Pension Bomb</a></li>
+    <li><a href="credits.html">Credits</a></li>
+  </ul>
+</footer>
+
+<script>
+// Chart 1: Budget concentration (horizontal bar)
+(function(){
+  const schemes = [
+    {name:'MGNREGS (rural employment guarantee)', budget:86000, color:'#1d4ed8'},
+    {name:'Jal Jeevan Mission (tap water)',        budget:70163, color:'#0891b2'},
+    {name:'PM Kisan (farmer income support)',      budget:60000, color:'#059669'},
+    {name:'Samagra Shiksha (schools)',             budget:37500, color:'#f59e0b'},
+    {name:'National Health Mission',               budget:36785, color:'#db2777'},
+    {name:'PM Awas Yojana — Rural',               budget:33300, color:'#7c3aed'},
+    {name:'PM Awas Yojana — Urban',               budget:21140, color:'#9333ea'},
+    {name:'PM Gram Sadak Yojana (rural roads)',    budget:19000, color:'#ea580c'},
+    {name:'National Rural Livelihood Mission',     budget:14129, color:'#16a34a'},
+    {name:'PM Fasal Bima Yojana (crop insurance)', budget:13625, color:'#65a30d'},
+    {name:'AMRUT (urban infra)',                   budget:8000,  color:'#78716c'},
+    {name:'PM-JAY Ayushman Bharat',               budget:7500,  color:'#e11d48'},
+    {name:'Swachh Bharat Mission',                budget:7192,  color:'#6366f1'},
+    {name:'National Livelihood Mission — Urban',   budget:3300,  color:'#8b5cf6'},
+    {name:'Smart Cities Mission',                  budget:2400,  color:'#64748b'},
+    {name:'All other 115+ schemes combined',       budget:30000, color:'#e2e8f0'},
+  ];
+  new Chart(document.getElementById('chart1'),{
+    type:'bar',
+    data:{
+      labels:schemes.map(s=>s.name),
+      datasets:[{data:schemes.map(s=>s.budget),backgroundColor:schemes.map(s=>s.color),borderRadius:3}]
+    },
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ₹${c.raw.toLocaleString('en-IN')} Cr`}}},
+      scales:{
+        x:{grid:{color:'#f1f5f9'},ticks:{callback:v=>'₹'+(v/1000).toFixed(0)+'k Cr',font:{size:11},color:'#94a3b8'}},
+        y:{grid:{display:false},ticks:{font:{size:11},color:'#475569'}}
+      }
+    }
+  });
+})();
+
+// Chart 2: Scheme count history
+(function(){
+  const labels = ['2001','2005','2010','2013','2014','2016 (reform)','2018','2020','2022','2024-25'];
+  const values = [250,220,180,160,147,66,98,116,128,133];
+  const colors = labels.map(l=>l.includes('reform')?'#16a34a':'#1d4ed8');
+  new Chart(document.getElementById('chart2'),{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        {label:'Number of CSS Schemes',data:values,backgroundColor:colors,borderRadius:4,order:1},
+        {label:'2016 Target (66)',data:Array(labels.length).fill(66),type:'line',borderColor:'#dc2626',borderDash:[6,4],borderWidth:2,pointRadius:0,fill:false,order:0}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,labels:{font:{size:11},color:'#475569',usePointStyle:true,boxWidth:12}},tooltip:{callbacks:{label:c=>c.dataset.label.includes('Target')?` Rationalised target: 66`:` ${c.raw} schemes`}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:11},color:'#475569'}},
+        y:{min:0,max:280,grid:{color:'#f1f5f9'},ticks:{font:{size:11},color:'#94a3b8',stepSize:50}}
+      }
+    }
+  });
+})();
+
+// Chart 3: State utilisation
+(function(){
+  const data = [
+    {s:'Kerala',v:94},{s:'Tamil Nadu',v:91},{s:'Gujarat',v:88},{s:'Maharashtra',v:85},
+    {s:'Karnataka',v:82},{s:'Andhra Pradesh',v:79},{s:'Rajasthan',v:73},{s:'Odisha',v:71},
+    {s:'Madhya Pradesh',v:71},{s:'Uttar Pradesh',v:68},{s:'West Bengal',v:65},{s:'Bihar',v:62},{s:'Jharkhand',v:58},
+  ];
+  const col = v => v>=85?'#16a34a':v>=70?'#ca8a04':'#dc2626';
+  new Chart(document.getElementById('chart3'),{
+    type:'bar',
+    data:{labels:data.map(d=>d.s),datasets:[{data:data.map(d=>d.v),backgroundColor:data.map(d=>col(d.v)),borderRadius:3}]},
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.raw}% utilisation`}}},
+      scales:{
+        x:{min:0,max:100,grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'%',font:{size:11},color:'#94a3b8'}},
+        y:{grid:{display:false},ticks:{font:{size:11},color:'#475569',autoSkip:false}}
+      }
+    }
+  });
+})();
+
+// Chart 4: Agriculture schemes grouped bar
+(function(){
+  const agri = [
+    {name:'PM Kisan',central:60000,state:0},
+    {name:'PM Fasal Bima',central:13625,state:4000},
+    {name:'PMKSY (irrigation)',central:7700,state:2500},
+    {name:'RKVY (agri dev)',central:7150,state:2383},
+    {name:'NHM Horticulture',central:2600,state:1100},
+    {name:'Agri Extension',central:1000,state:400},
+  ];
+  new Chart(document.getElementById('chart4'),{
+    type:'bar',
+    data:{
+      labels:agri.map(s=>s.name),
+      datasets:[
+        {label:'Central Share (₹ Cr)',data:agri.map(s=>s.central),backgroundColor:'#1d4ed8',borderRadius:3},
+        {label:'State Share (₹ Cr)',data:agri.map(s=>s.state),backgroundColor:'#ea580c',borderRadius:3}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,labels:{font:{size:11},color:'#475569',usePointStyle:true,boxWidth:12}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ₹${c.raw.toLocaleString('en-IN')} Cr`}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:10},color:'#475569',maxRotation:25}},
+        y:{grid:{color:'#f1f5f9'},ticks:{callback:v=>'₹'+(v/1000).toFixed(0)+'k',font:{size:11},color:'#94a3b8'}}
+      }
+    }
+  });
+})();
+</script>
+<button id="btt" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="position:fixed;bottom:1.5rem;right:1.5rem;width:40px;height:40px;background:var(--navy);color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:1.1rem;opacity:0;transition:opacity .2s,transform .2s;transform:translateY(8px);z-index:98;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,.25)">↑</button>
+<script>
+(function(){
+  var p=document.getElementById('progress'),b=document.getElementById('btt');
+  window.addEventListener('scroll',function(){
+    var t=document.documentElement.scrollHeight-window.innerHeight;
+    if(p) p.style.width=(t>0?window.scrollY/t*100:0)+'%';
+    if(b){b.style.opacity=window.scrollY>300?1:0;b.style.transform=window.scrollY>300?'translateY(0)':'translateY(8px)';}
+  },{passive:true});
+})();
+</script>
+</body>
+</html>

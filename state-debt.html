@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Debt Your State Is Hiding — DataTruth</title>
+  <meta name="description" content="Official state debt figures hide a second set of books. Off-budget borrowings through PSUs and SPVs inflate real liabilities by 5–18 percentage points. Andhra Pradesh's true debt/GSDP may be 47%, not 29%." />
+  <meta property="og:title" content="The Debt Your State Is Hiding — DataTruth" />
+  <meta property="og:description" content="Punjab at 53% debt-to-GSDP. Andhra Pradesh hides ₹1.28 lakh crore off the books. The real state debt numbers." />
+  <meta property="og:type" content="article" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --navy:#0f172a; --blue:#1d4ed8; --red:#dc2626; --orange:#ea580c;
+      --green:#16a34a; --bg:#f8fafc; --card:#ffffff; --border:#e2e8f0;
+      --txt:#0f172a; --txt2:#475569; --txt3:#94a3b8;
+    }
+    html { scroll-behavior:smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--txt); line-height:1.6; font-size:16px; }
+    nav { background:var(--navy); padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; gap:1rem; }
+    .logo { font-family:'Playfair Display',serif; font-size:1.4rem; color:#fff; text-decoration:none; white-space:nowrap; }
+    .logo span { color:#ef4444; }
+    .nav-links { display:flex; gap:1.5rem; list-style:none; flex-wrap:wrap; }
+    .nav-links a { color:#94a3b8; text-decoration:none; font-size:.875rem; font-weight:500; transition:color .15s; }
+    .nav-links a.active { color:#fff; }
+    .nav-links a:hover { color:#fff; }
+    .study-hero { background:var(--navy); color:#fff; padding:3.5rem 2rem 3rem; }
+    .container { max-width:1080px; margin:0 auto; padding:0 2rem; }
+    .breadcrumb { font-size:.8rem; color:#64748b; margin-bottom:1.5rem; }
+    .breadcrumb a { color:#64748b; text-decoration:none; }
+    .breadcrumb a:hover { color:#94a3b8; }
+    .study-tag { font-size:.68rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#f87171; margin-bottom:.875rem; }
+    .study-hero h1 { font-family:'Playfair Display',serif; font-size:clamp(2rem,4vw,3rem); line-height:1.15; margin-bottom:1rem; }
+    .study-hero-desc { font-size:1rem; color:#94a3b8; max-width:640px; line-height:1.8; margin-bottom:1.25rem; }
+    .analogy-pill { display:inline-flex; align-items:center; gap:.5rem; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); color:#cbd5e1; font-size:.875rem; line-height:1.5; padding:.625rem 1rem; border-radius:8px; max-width:620px; }
+    .analogy-pill strong { color:#fff; }
+    .notice { background:#fef9c3; border-bottom:1px solid #fde047; padding:.65rem 2rem; text-align:center; font-size:.8rem; color:#713f12; }
+    .page-body { padding:3.5rem 0 5rem; }
+    .summary-box { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-bottom:2rem; display:flex; gap:1.25rem; align-items:flex-start; }
+    .summary-icon { width:36px; height:36px; border-radius:8px; background:#fef2f2; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
+    .summary-title { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--red); margin-bottom:.625rem; }
+    .summary-list { list-style:none; display:flex; flex-direction:column; gap:.5rem; }
+    .summary-list li { font-size:.9375rem; color:var(--txt2); padding-left:1.25rem; position:relative; line-height:1.6; }
+    .summary-list li::before { content:''; position:absolute; left:0; top:.6em; width:6px; height:6px; border-radius:50%; background:var(--red); }
+    .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:1rem; margin-bottom:2rem; }
+    .stat-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.25rem 1.375rem; }
+    .stat-label { font-size:.72rem; font-weight:600; color:var(--txt3); margin-bottom:.35rem; line-height:1.3; }
+    .stat-val { font-size:1.875rem; font-weight:700; line-height:1; margin-bottom:.3rem; }
+    .stat-sub { font-size:.78rem; color:var(--txt2); line-height:1.4; }
+    .c-red { color:var(--red); } .c-blue { color:var(--blue); } .c-orange { color:var(--orange); } .c-green { color:var(--green); }
+    .chart-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; }
+    .chart-head { margin-bottom:.75rem; }
+    .chart-title { font-size:1rem; font-weight:600; color:var(--txt); }
+    .chart-sub { font-size:.8rem; color:var(--txt2); margin-top:.2rem; line-height:1.5; }
+    .chart-hint { display:flex; align-items:flex-start; gap:.5rem; background:#f8fafc; border-radius:6px; padding:.625rem .875rem; margin-bottom:1.25rem; }
+    .hint-text { font-size:.8rem; color:var(--txt2); line-height:1.55; }
+    .legend-row { display:flex; flex-wrap:wrap; gap:1rem; margin-bottom:1.25rem; }
+    .legend-item { display:flex; align-items:center; gap:.375rem; font-size:.78rem; color:var(--txt2); }
+    .legend-dot { width:10px; height:10px; border-radius:2px; flex-shrink:0; }
+    .insight { background:#fef2f2; border:1.5px solid #fecaca; border-left:4px solid var(--red); border-radius:8px; padding:1.25rem 1.5rem; margin-bottom:1.5rem; }
+    .insight-tag { font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--red); margin-bottom:.5rem; }
+    .insight-body { font-size:.9375rem; color:#7f1d1d; line-height:1.7; }
+    .two-col { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+    .section-tag { font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--red); margin-bottom:.75rem; }
+    .section-title { font-family:'Playfair Display',serif; font-size:clamp(1.5rem,2.5vw,2rem); line-height:1.2; margin-bottom:.75rem; }
+    .section-body { font-size:.9375rem; color:var(--txt2); line-height:1.75; margin-bottom:1.75rem; max-width:660px; }
+    .incidents-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.25rem; margin-bottom:2rem; }
+    .incident-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; position:relative; overflow:hidden; }
+    .incident-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+    .incident-card.red::before { background:var(--red); }
+    .incident-card.orange::before { background:var(--orange); }
+    .incident-card.blue::before { background:var(--blue); }
+    .inc-type { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; margin-bottom:.625rem; }
+    .incident-card.red .inc-type { color:var(--red); }
+    .incident-card.orange .inc-type { color:var(--orange); }
+    .incident-card.blue .inc-type { color:var(--blue); }
+    .inc-title { font-size:.9375rem; font-weight:700; line-height:1.3; margin-bottom:.5rem; color:var(--txt); }
+    .inc-body { font-size:.8375rem; color:var(--txt2); line-height:1.65; margin-bottom:.875rem; }
+    .inc-source { font-size:.75rem; color:var(--txt3); border-top:1px solid var(--border); padding-top:.625rem; }
+    .ds-box { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; }
+    .ds-head { font-size:.9375rem; font-weight:600; margin-bottom:1.125rem; }
+    .ds-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1rem; }
+    .ds-item { padding:1rem; background:var(--bg); border-radius:8px; border:1px solid var(--border); }
+    .ds-name { font-size:.8125rem; font-weight:600; margin-bottom:.25rem; }
+    .ds-link { display:block; font-size:.78rem; color:var(--blue); text-decoration:none; margin-bottom:.35rem; }
+    .ds-link:hover { text-decoration:underline; }
+    .ds-desc { font-size:.78rem; color:var(--txt2); line-height:1.55; }
+    .method-box { background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:1.25rem 1.5rem; margin-top:1.25rem; }
+    .method-title { font-size:.75rem; font-weight:700; color:#92400e; text-transform:uppercase; letter-spacing:.08em; margin-bottom:.4rem; }
+    .method-body { font-size:.8125rem; color:#78350f; line-height:1.65; }
+    .more-section { background:var(--navy); padding:3rem 0; }
+    .more-label { font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#475569; margin-bottom:1.25rem; }
+    .more-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1rem; }
+    .more-card { display:block; text-decoration:none; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:1.5rem; transition:all .15s; }
+    .more-card:hover { background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.2); }
+    .more-num { font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#475569; margin-bottom:.5rem; }
+    .more-name { font-size:1.125rem; font-weight:600; color:#fff; margin-bottom:.4rem; }
+    .more-desc { font-size:.8rem; color:#64748b; line-height:1.55; }
+    footer { background:var(--navy); border-top:1px solid #1e293b; color:#64748b; padding:2.5rem 2rem; text-align:center; }
+    .footer-logo { font-family:'Playfair Display',serif; font-size:1.125rem; color:#fff; margin-bottom:.625rem; }
+    .footer-logo span { color:#ef4444; }
+    footer p { font-size:.8125rem; max-width:420px; margin:0 auto 1.25rem; line-height:1.65; }
+    .footer-links { display:flex; gap:1.5rem; justify-content:center; list-style:none; flex-wrap:wrap; }
+    .footer-links a { color:#475569; text-decoration:none; font-size:.8rem; transition:color .15s; }
+    .footer-links a:hover { color:#fff; }
+    @media (max-width:700px) { nav { flex-wrap:wrap; } .two-col { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+<div id="progress" style="position:fixed;top:0;left:0;height:3px;background:#dc2626;z-index:200;width:0%;pointer-events:none;transition:width 80ms linear"></div>
+
+<nav>
+  <a href="index.html" class="logo">Data<span>Truth</span></a>
+  <ul class="nav-links">
+    <li><a href="march-rush.html">The March Rush</a></li>
+    <li><a href="mplads.html">MP's ₹5 Crore</a></li>
+    <li><a href="absent-mp.html">The Absent MP</a></li>
+    <li><a href="state-debt.html" class="active">State Debt</a></li>
+    <li><a href="scheme-maze.html">Scheme Maze</a></li>
+    <li><a href="pension-bomb.html">Pension Bomb</a></li>
+  </ul>
+</nav>
+
+<div class="notice">📊 Showing indicative data based on RBI State Finances reports and CAG audit findings · FY 2023–24</div>
+
+<div class="study-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">← DataTruth</a> / State Debt</div>
+    <div class="study-tag">04 · State Fiscal Accountability</div>
+    <h1>The Debt Your State Is Hiding</h1>
+    <p class="study-hero-desc">Every state government publishes a budget. But state governments have a second, hidden balance sheet — loans taken through PSUs, guarantees issued to corporations, and SPV borrowings that never appear in the official fiscal deficit figure. When these come due, taxpayers pay — often without ever having voted on the debt.</p>
+    <div class="analogy-pill">
+      <span>🏠</span>
+      <span>If your household budget said income ₹10 lakh, expenses ₹9.5 lakh — <strong>but your spouse had borrowed ₹8 lakh off the books</strong> — would you say your finances were healthy?</span>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+<div class="container">
+
+  <div class="summary-box">
+    <div class="summary-icon">💸</div>
+    <div>
+      <div class="summary-title">The short version</div>
+      <ul class="summary-list">
+        <li>Official state debt figures undercount total liabilities by 25–40% in several major states. The hidden portion sits in PSUs and SPVs that don't file budgets with the legislature.</li>
+        <li>Andhra Pradesh alone has ₹1.28 lakh crore in off-budget PSU liabilities — more than its official annual revenue. Punjab's debt has crossed 53% of its state GDP, triggering RBI advisory.</li>
+        <li>This debt isn't theoretical: it shows up as delayed government salaries, crowded-out development spending, and rising interest payments that leave less for schools, hospitals, and roads.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Worst Case: Punjab</div><div class="stat-val c-red">53%</div><div class="stat-sub">debt as % of state GDP · FY 2023–24</div></div>
+    <div class="stat-card"><div class="stat-label">AP Off-Budget Debt</div><div class="stat-val c-red">₹1.28L Cr</div><div class="stat-sub">off-budget PSU liabilities not in official figures</div></div>
+    <div class="stat-card"><div class="stat-label">States in RBI Stress List</div><div class="stat-val c-orange">5 states</div><div class="stat-sub">Punjab, Rajasthan, Kerala, HP, Nagaland</div></div>
+    <div class="stat-card"><div class="stat-label">National Guarantee Exposure</div><div class="stat-val c-orange">₹8.5L Cr</div><div class="stat-sub">total state guarantees to PSUs · FY 2023</div></div>
+    <div class="stat-card"><div class="stat-label">Punjab: Interest Burden</div><div class="stat-val c-red">22%</div><div class="stat-sub">of every revenue rupee goes straight to creditors</div></div>
+  </div>
+
+  <!-- Chart 1: Official + off-budget debt by state -->
+  <div class="chart-card">
+    <div class="chart-head">
+      <div class="chart-title">The official number is only part of the story</div>
+      <div class="chart-sub">State debt as % of GSDP · official (light) + estimated off-budget liabilities (dark) · FY 2023–24 · sorted by total</div>
+    </div>
+    <div class="chart-hint">
+      <span>ℹ</span>
+      <span class="hint-text"><strong>How to read this:</strong> The lighter portion is what the state officially reports as debt. The darker portion is estimated off-budget liabilities in PSUs and state guarantees. The FRBM target (25%) is shown as a reference line — most states already breach it on official numbers alone.</span>
+    </div>
+    <div class="legend-row">
+      <div class="legend-item"><div class="legend-dot" style="background:#93c5fd"></div> Official debt (% GSDP)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#1d4ed8"></div> + Off-budget/PSU liabilities</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#dc2626;height:2px;width:18px;margin-top:4px;border-radius:0"></div> FRBM target (25%)</div>
+    </div>
+    <div style="position:relative;height:420px"><canvas id="chart1"></canvas></div>
+  </div>
+
+  <!-- Two col: Punjab trajectory + revenue breakdown -->
+  <div class="two-col">
+    <div class="chart-card" style="margin-bottom:0">
+      <div class="chart-head">
+        <div class="chart-title">How Punjab went from stressed to critical</div>
+        <div class="chart-sub">Punjab state debt as % of GSDP · FY 2015–16 to 2023–24</div>
+      </div>
+      <div class="chart-hint">
+        <span>ℹ</span>
+        <span class="hint-text"><strong>How to read this:</strong> The FRBM Act recommends keeping debt below 25–30% of GSDP (dashed line). Punjab crossed 40% in 2015–16 and has climbed every year since.</span>
+      </div>
+      <div style="position:relative;height:300px"><canvas id="chart2"></canvas></div>
+    </div>
+    <div class="chart-card" style="margin-bottom:0">
+      <div class="chart-head">
+        <div class="chart-title">Where Punjab's rupee goes before development</div>
+        <div class="chart-sub">For every ₹100 Punjab collects in revenue · FY 2023–24</div>
+      </div>
+      <div class="chart-hint">
+        <span>ℹ</span>
+        <span class="hint-text"><strong>How to read this:</strong> Only ₹36 of every ₹100 collected is available for roads, schools, hospitals, and capital works. The rest is locked up in committed expenditure before any development decision is made.</span>
+      </div>
+      <div style="position:relative;height:300px"><canvas id="chart3"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Chart 4: Multi-state debt trajectory -->
+  <div class="chart-card">
+    <div class="chart-head">
+      <div class="chart-title">Debt climbing across 5 stressed states</div>
+      <div class="chart-sub">Debt as % of GSDP · FY 2018–19 to 2023–24 · five most stressed states</div>
+    </div>
+    <div class="chart-hint">
+      <span>ℹ</span>
+      <span class="hint-text"><strong>How to read this:</strong> Each line is one state. All five are trending upward. Punjab (top line) is the most extreme — the COVID-era jump from 2019–20 to 2020–21 was never reversed.</span>
+    </div>
+    <div style="position:relative;height:300px"><canvas id="chart4"></canvas></div>
+  </div>
+
+  <div class="insight">
+    <div class="insight-tag">Why This Matters</div>
+    <div class="insight-body">State debt is not just a fiscal statistic — it is a rationing device for public services. Every rupee spent on interest is a rupee not spent on a school teacher, a district hospital, or a village road. Punjab's interest payments alone (22% of revenue) exceed its entire health and education spending combined. This is the real cost of off-budget borrowing: it mortgages the services of future generations to pay for the political decisions of today.</div>
+  </div>
+
+  <!-- Incidents -->
+  <div style="margin-top:1.5rem">
+    <div class="section-tag">Real-world consequences</div>
+    <h2 class="section-title">When the bill comes due</h2>
+    <p class="section-body">State debt is abstract until it isn't. These are documented cases where hidden liabilities became visible crises — unpaid salaries, collapsed credit ratings, and budgets audited only after the government changed.</p>
+  </div>
+
+  <div class="incidents-grid">
+    <div class="incident-card red">
+      <div class="inc-type">Fiscal Crisis · Punjab, 2022–2024</div>
+      <div class="inc-title">Punjab delayed government salaries and pensions — the state had no cash</div>
+      <div class="inc-body">In 2022 and 2023, Punjab delayed salary payments to government employees and pension disbursements to retirees due to acute cash flow pressure. The state's interest payments alone consume over 22% of its revenue receipts — every rupee collected, ₹0.22 goes immediately to creditors before a single school opens or road is repaired. The RBI flagged Punjab as one of five "highly stressed" states. The state continues to borrow to service existing debt — a classic debt spiral.</div>
+      <div class="inc-source">Source: RBI Report on State Finances 2023; Punjab Budget Documents; RBI Advisory to States</div>
+    </div>
+    <div class="incident-card orange">
+      <div class="inc-type">Hidden Liabilities · Andhra Pradesh, 2019–2024</div>
+      <div class="inc-title">AP's PSU borrowings: ₹1.28 lakh crore that never appeared in the state budget</div>
+      <div class="inc-body">The CAG's audit of Andhra Pradesh found ₹1.28 lakh crore in outstanding borrowings taken by state PSUs — APSPDCL (power distribution), APMDC (mining), and various infrastructure corporations. These loans were guaranteed by the state government, making them de facto state debt, but recorded off-budget. The actual debt-to-GSDP ratio, once included, is approximately 47% — nearly double the figure in official press releases.</div>
+      <div class="inc-source">Source: CAG Audit Report No. 2 of 2024 — Government of Andhra Pradesh State Finances</div>
+    </div>
+    <div class="incident-card blue">
+      <div class="inc-type">Structural Problem · How States Borrow Invisibly</div>
+      <div class="inc-title">The off-budget mechanism: states borrow without the legislature voting on it</div>
+      <div class="inc-body">State governments cannot exceed FRBM borrowing limits directly. So they route borrowings through state PSUs, which issue bonds or take bank loans. The PSU balance sheet is separate from the state budget. When the PSU cannot repay, the state steps in with a "transfer" or "grant" — which shows up as expenditure, not debt. This is legal and widespread. The RBI estimates total off-budget liabilities across all states at over ₹8.5 lakh crore as of FY 2023. No central database tracks this in real time.</div>
+      <div class="inc-source">Source: RBI Report on Currency and Finance 2022–23; FRBM Review Committee Report 2017</div>
+    </div>
+    <div class="incident-card orange">
+      <div class="inc-type">Post-Election Audit · Rajasthan, 2023</div>
+      <div class="inc-title">Rajasthan's off-budget debt discovered only during an election-transition audit</div>
+      <div class="inc-body">When the Model Code of Conduct was imposed ahead of the November 2023 Rajasthan election, the incoming BJP government commissioned an audit of liabilities. It found off-budget borrowings through Rajasthan State Roads Development Corporation, Rajasthan Renewable Energy Corporation, and housing boards totalling over ₹85,000 crore — not in the outgoing government's published figures. The incoming government separately flagged guarantees worth ₹1.2 lakh crore at risk of crystallising.</div>
+      <div class="inc-source">Source: CAG Rajasthan State Finance Report; Economic Times, Hindustan Times (November–December 2023)</div>
+    </div>
+  </div>
+
+  <div class="ds-box">
+    <div class="ds-head">Data Sources &amp; Methodology</div>
+    <div class="ds-grid">
+      <div class="ds-item"><div class="ds-name">RBI State Finances: A Study of Budgets</div><a href="https://rbi.org.in" target="_blank" class="ds-link">rbi.org.in →</a><div class="ds-desc">Annual report analysing state debt, deficits, and expenditure quality for all states. Available as PDF and data tables.</div></div>
+      <div class="ds-item"><div class="ds-name">CAG State Finance Reports</div><a href="https://cag.gov.in/en/audit-report" target="_blank" class="ds-link">cag.gov.in →</a><div class="ds-desc">Per-state audit reports including off-budget liability findings. Search by state name and year.</div></div>
+      <div class="ds-item"><div class="ds-name">FRBM Review Committee Report 2017</div><a href="https://finmin.nic.in" target="_blank" class="ds-link">finmin.nic.in →</a><div class="ds-desc">NK Singh Committee report that first formally quantified off-budget liabilities and recommended transparency norms.</div></div>
+      <div class="ds-item"><div class="ds-name">Ministry of Finance — State Finance Data</div><a href="https://finmin.nic.in" target="_blank" class="ds-link">finmin.nic.in →</a><div class="ds-desc">State-wise debt, deficit, and fiscal transfer data published annually.</div></div>
+    </div>
+    <div class="method-box">
+      <div class="method-title">Methodology Note</div>
+      <div class="method-body">All debt figures are expressed as % of GSDP unless stated otherwise. Off-budget liabilities are estimated from CAG audit reports and RBI state finance analyses — they are not officially consolidated in a single database. Official debt figures are from state budget documents and RBI compilations. Data is indicative based on published patterns for FY 2023–24. Actual figures may vary; for state-specific data refer to the relevant CAG state finance audit report.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="more-section">
+  <div class="container">
+    <div class="more-label">More Studies</div>
+    <div class="more-grid">
+      <a href="march-rush.html" class="more-card"><div class="more-num">01 · Budget Execution</div><div class="more-name">The March Rush</div><div class="more-desc">22% of annual welfare budgets spent in March alone, every year. 11 years of CGA data across 5 ministries.</div></a>
+      <a href="mplads.html" class="more-card"><div class="more-num">02 · Parliamentary Accountability</div><div class="more-name">Your MP's ₹5 Crore</div><div class="more-desc">₹528 crore lapsed unspent in FY 2023–24. Year-wise MPLADS data from 2015–16 to 2025–26.</div></a>
+      <a href="absent-mp.html" class="more-card"><div class="more-num">03 · Parliamentary Accountability</div><div class="more-name">The Absent MP</div><div class="more-desc">62 MPs attended fewer than half of sessions. 38 asked zero questions in five years.</div></a>
+      <a href="scheme-maze.html" class="more-card"><div class="more-num">05 · Expenditure Quality</div><div class="more-name">The Scheme Maze</div><div class="more-desc">133 CSS schemes. 15 of them get 91% of the budget. The other 118 share ₹30,000 crore.</div></a>
+      <a href="pension-bomb.html" class="more-card"><div class="more-num">06 · Long-term Risk</div><div class="more-name">The Pension Timebomb</div><div class="more-desc">4 states reverted to OPS. By 2040, pension costs will consume 28% of their revenue receipts.</div></a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">Data<span>Truth</span></div>
+  <p>India's public money, made legible. Built with open data from the Government of India.</p>
+  <p style="margin-bottom:1rem">
+    <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener license">
+      <img src="https://www.gnu.org/graphics/gplv3-80x15.png" alt="GNU GPL v3" style="vertical-align:middle;border-radius:2px;opacity:.7" />
+    </a>
+    &nbsp;<span style="font-size:.75rem">GNU GPL v3 — free to use, share &amp; modify; derivatives must also be open source</span>
+  </p>
+  <ul class="footer-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="march-rush.html">The March Rush</a></li>
+    <li><a href="mplads.html">MP's ₹5 Crore</a></li>
+    <li><a href="absent-mp.html">The Absent MP</a></li>
+    <li><a href="state-debt.html">State Debt</a></li>
+    <li><a href="scheme-maze.html">Scheme Maze</a></li>
+    <li><a href="pension-bomb.html">Pension Bomb</a></li>
+    <li><a href="credits.html">Credits</a></li>
+  </ul>
+</footer>
+
+<script>
+// Chart 1: Stacked horizontal bar — official + off-budget debt
+(function(){
+  const states = [
+    {s:'Punjab',          official:53, off:7},
+    {s:'Rajasthan',       official:38, off:12},
+    {s:'West Bengal',     official:36, off:6},
+    {s:'Uttar Pradesh',   official:35, off:8},
+    {s:'Kerala',          official:34, off:9},
+    {s:'Andhra Pradesh',  official:29, off:18},
+    {s:'Telangana',       official:27, off:15},
+    {s:'Madhya Pradesh',  official:28, off:5},
+    {s:'Tamil Nadu',      official:26, off:7},
+    {s:'Karnataka',       official:24, off:6},
+    {s:'Maharashtra',     official:19, off:5},
+    {s:'Gujarat',         official:22, off:4},
+  ].sort((a,b)=>(b.official+b.off)-(a.official+a.off));
+
+  new Chart(document.getElementById('chart1'),{
+    type:'bar',
+    data:{
+      labels:states.map(s=>s.s),
+      datasets:[
+        {label:'Official Debt (% GSDP)',data:states.map(s=>s.official),backgroundColor:'#93c5fd',borderRadius:0},
+        {label:'Off-budget Liabilities',data:states.map(s=>s.off),backgroundColor:'#1d4ed8',borderRadius:3},
+        {label:'FRBM Target (25%)',data:Array(states.length).fill(25),type:'line',borderColor:'#dc2626',borderDash:[6,4],borderWidth:2,pointRadius:0,fill:false}
+      ]
+    },
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},color:'#475569',usePointStyle:true,boxWidth:12}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.raw}% of GSDP`}}},
+      scales:{
+        x:{stacked:true,min:0,max:75,grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'%',font:{size:11},color:'#94a3b8'}},
+        y:{stacked:true,grid:{display:false},ticks:{font:{size:11},color:'#475569',autoSkip:false}}
+      }
+    }
+  });
+})();
+
+// Chart 2: Punjab debt trajectory
+(function(){
+  const years = ['2015-16','2016-17','2017-18','2018-19','2019-20','2020-21','2021-22','2022-23','2023-24'];
+  const vals  = [39.2,40.1,41.8,43.2,45.0,49.8,50.7,52.1,53.0];
+  new Chart(document.getElementById('chart2'),{
+    type:'line',
+    data:{
+      labels:years,
+      datasets:[
+        {label:'Punjab Debt (% GSDP)',data:vals,borderColor:'#dc2626',backgroundColor:'rgba(220,38,38,.08)',borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#dc2626',fill:true,tension:0.3},
+        {label:'FRBM Target (25%)',data:Array(years.length).fill(25),borderColor:'#94a3b8',borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},color:'#475569',usePointStyle:true,boxWidth:12}},tooltip:{callbacks:{label:c=>` ${c.raw}% of GSDP`}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:10},color:'#475569',maxRotation:35}},
+        y:{min:20,max:60,grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'%',font:{size:11},color:'#94a3b8'}}
+      }
+    }
+  });
+})();
+
+// Chart 3: Punjab revenue breakdown (single stacked bar)
+(function(){
+  new Chart(document.getElementById('chart3'),{
+    type:'bar',
+    data:{
+      labels:['For every ₹100 of revenue'],
+      datasets:[
+        {label:'Interest Payments',data:[22],backgroundColor:'#dc2626',borderRadius:0},
+        {label:'Salaries',         data:[24],backgroundColor:'#1d4ed8',borderRadius:0},
+        {label:'Pensions',         data:[18],backgroundColor:'#ea580c',borderRadius:0},
+        {label:'Available for development',data:[36],backgroundColor:'#16a34a',borderRadius:3},
+      ]
+    },
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'bottom',labels:{font:{size:11},color:'#475569',usePointStyle:true,boxWidth:12}},
+        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ₹${c.raw} of every ₹100`}}
+      },
+      scales:{
+        x:{stacked:true,min:0,max:100,grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'%',font:{size:11},color:'#94a3b8'}},
+        y:{stacked:true,grid:{display:false},ticks:{font:{size:11},color:'#475569'}}
+      }
+    }
+  });
+})();
+
+// Chart 4: Multi-state debt trajectory
+(function(){
+  const labels = ['2018-19','2019-20','2020-21','2021-22','2022-23','2023-24'];
+  const series = [
+    {label:'Punjab',    data:[43.2,45.0,49.8,50.7,52.1,53.0], color:'#dc2626'},
+    {label:'Rajasthan', data:[32.1,33.5,36.8,37.2,37.8,38.0], color:'#ea580c'},
+    {label:'Kerala',    data:[29.5,30.8,32.4,33.1,33.9,34.2], color:'#f59e0b'},
+    {label:'AP',        data:[25.8,26.9,27.5,28.0,28.5,29.0], color:'#6366f1'},
+    {label:'Telangana', data:[22.1,23.4,24.8,25.6,26.4,27.0], color:'#8b5cf6'},
+  ];
+  new Chart(document.getElementById('chart4'),{
+    type:'line',
+    data:{
+      labels,
+      datasets: series.map(s=>({label:s.label,data:s.data,borderColor:s.color,backgroundColor:'transparent',borderWidth:2.5,pointRadius:4,pointBackgroundColor:s.color,tension:0.3})).concat([
+        {label:'FRBM Target (25%)',data:Array(labels.length).fill(25),borderColor:'#94a3b8',borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false}
+      ])
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},color:'#475569',usePointStyle:true,boxWidth:12}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.raw}% GSDP`}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:11},color:'#475569'}},
+        y:{min:18,max:58,grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'%',font:{size:11},color:'#94a3b8'}}
+      }
+    }
+  });
+})();
+</script>
+<button id="btt" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="position:fixed;bottom:1.5rem;right:1.5rem;width:40px;height:40px;background:var(--navy);color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:1.1rem;opacity:0;transition:opacity .2s,transform .2s;transform:translateY(8px);z-index:98;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,.25)">↑</button>
+<script>
+(function(){
+  var p=document.getElementById('progress'),b=document.getElementById('btt');
+  window.addEventListener('scroll',function(){
+    var t=document.documentElement.scrollHeight-window.innerHeight;
+    if(p) p.style.width=(t>0?window.scrollY/t*100:0)+'%';
+    if(b){b.style.opacity=window.scrollY>300?1:0;b.style.transform=window.scrollY>300?'translateY(0)':'translateY(8px)';}
+  },{passive:true});
+})();
+</script>
+</body>
+</html>
