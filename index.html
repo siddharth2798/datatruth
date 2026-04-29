@@ -105,160 +105,42 @@
       nav { flex-wrap:wrap; }
     }
 
-  /* --- Dropdown --- */
-.dropdown { 
-  position: relative;
-  padding-bottom: .75rem; /* prevents hover gap */
-}
-
-.dropdown-toggle::after {
-  content: "▾";
-  display: inline-block;
-  margin-left: .35rem;
-  font-size: .75em;
-  opacity: .9;
-}
-
-.dropdown-menu {
-  position: absolute;
-  top: 100%; /* FIX: removed gap */
-  left: 0;
-  min-width: 220px;
-
-  list-style: none;
-  margin: 0;
-  padding: .5rem;
-
-  background: rgba(15, 23, 42, .98);
-  border: 1px solid rgba(148, 163, 184, .18);
-  border-radius: 12px;
-  box-shadow: 0 16px 50px rgba(0,0,0,.35);
-
-  /* smoother show/hide */
-  display: block;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity .15s ease;
-
-  z-index: 200;
-}
-
-.dropdown-menu a {
-  display: block;
-  padding: .55rem .65rem;
-  border-radius: 10px;
-  color: #94a3b8;
-  text-decoration: none;
-  font-size: .875rem;
-  font-weight: 500;
-  transition: background .15s, color .15s;
-  white-space: nowrap;
-}
-
-.dropdown-menu a:hover {
-  color: #fff;
-  background: rgba(148, 163, 184, .12);
-}
-
-/* show on hover */
-.dropdown:hover .dropdown-menu,
-.dropdown:focus-within .dropdown-menu {
-  opacity: 1;
-  visibility: visible;
-}
-
-/* keyboard focus */
-.dropdown-toggle:focus {
-  outline: 2px solid rgba(239, 68, 68, .6);
-  outline-offset: 3px;
-}
-
-/* mobile */
-@media (max-width:700px) {
-
-  .dropdown {
-    width: 100%;
-  }
-
-  .dropdown-menu {
-    position: static;
-    
-    max-height: 0;
-    overflow: hidden;
-
-    opacity: 1;
-    visibility: visible;
-
-    padding: 0;
-    background: transparent;
-    border: none;
-    box-shadow: none;
-
-    transition: max-height 0.3s ease;
-  }
-
-  .dropdown.active .dropdown-menu {
-    max-height: 500px; /* enough to show all items */
-    padding-top: .25rem;
-  }
-
-  .dropdown-toggle::after {
-    content: "▾";
-    float: right;
-  }
-
-  .dropdown-menu a {
-    padding: .5rem 0;
-    border-radius: 0;
-  }
-
-  .dropdown-menu a:hover {
-    background: transparent;
-  }
-}
+    /* ── NAV DROPDOWN ── */
+    .nav-links { display:flex; gap:1.25rem; list-style:none; align-items:center; flex-wrap:wrap; }
+    .nav-links > li > a { color:#94a3b8; text-decoration:none; font-size:.875rem; font-weight:500; transition:color .15s; }
+    .nav-links > li > a.active, .nav-links > li > a:hover { color:#fff; }
+    .nav-dropdown { position:relative; }
+    .nav-dropdown-btn { color:#94a3b8; background:none; border:none; cursor:pointer; font-size:.875rem; font-weight:500; font-family:'Inter',sans-serif; display:flex; align-items:center; gap:.25rem; padding:0; transition:color .15s; white-space:nowrap; }
+    .nav-dropdown-btn.active, .nav-dropdown-btn:hover { color:#fff; }
+    .nav-dropdown-menu { position:absolute; top:calc(100% + .625rem); left:0; background:#1e293b; border:1px solid #334155; border-radius:10px; padding:.5rem; min-width:215px; opacity:0; visibility:hidden; transform:translateY(-6px); transition:opacity .15s,transform .15s,visibility .15s; z-index:200; list-style:none; box-shadow:0 8px 32px rgba(0,0,0,.4); }
+    .nav-dropdown:hover .nav-dropdown-menu, .nav-dropdown:focus-within .nav-dropdown-menu { opacity:1; visibility:visible; transform:translateY(0); }
+    .nav-dropdown-menu li a { display:flex; align-items:center; gap:.625rem; padding:.5rem .75rem; border-radius:6px; color:#94a3b8; text-decoration:none; font-size:.8125rem; font-weight:500; transition:background .1s,color .1s; }
+    .nav-dropdown-menu li a:hover { background:rgba(255,255,255,.07); color:#fff; }
+    .nav-dropdown-menu li a.active { color:#fff; background:rgba(255,255,255,.05); }
+    .menu-num { font-size:.65rem; font-weight:700; color:#475569; min-width:18px; flex-shrink:0; }
   </style>
 </head>
 <body>
 
 <nav>
   <a href="index.html" class="logo">Data<span>Truth</span></a>
-
-  <ul class="nav-links">
-    <li class="dropdown">
-      <a href="#studies" class="dropdown-toggle">Project</a>
-      <ul class="dropdown-menu">
-        <li><a href="march-rush.html">The March Rush</a></li>
-        <li><a href="mplads.html">MP's ₹5 Crore</a></li>
-        <li><a href="absent-mp.html">The Absent MP</a></li>
-        <li><a href="state-debt.html">State Debt</a></li>
-        <li><a href="scheme-maze.html">Scheme Maze</a></li>
-        <li><a href="pension-bomb.html">Pension Bomb</a></li>
+    <ul class="nav-links">
+    <li class="nav-dropdown">
+      <button class="nav-dropdown-btn">Studies</button>
+      <ul class="nav-dropdown-menu">
+        <li><a href="march-rush.html"><span class="menu-num">01</span> The March Rush</a></li>
+        <li><a href="mplads.html"><span class="menu-num">02</span> MP's ₹5 Crore</a></li>
+        <li><a href="absent-mp.html"><span class="menu-num">03</span> The Absent MP</a></li>
+        <li><a href="state-debt.html"><span class="menu-num">04</span> State Debt</a></li>
+        <li><a href="scheme-maze.html"><span class="menu-num">05</span> Scheme Maze</a></li>
+        <li><a href="pension-bomb.html"><span class="menu-num">06</span> Pension Bomb</a></li>
       </ul>
     </li>
-
     <li><a href="credits.html">Credits</a></li>
+    <li><a href="https://github.com/siddharth2798/datatruth/blob/main/LICENSE" target="_blank" rel="noopener">License</a></li>
   </ul>
 </nav>
 
-<script>
-// Mobile menu toggle
-const menuToggle = document.querySelector(".menu-toggle");
-const navMenu = document.querySelector(".nav-menu");
-
-menuToggle.addEventListener("click", () => {
-  navMenu.classList.toggle("active");
-});
-
-// Dropdown toggle (mobile)
-document.querySelectorAll(".dropdown-toggle").forEach(toggle => {
-  toggle.addEventListener("click", (e) => {
-    if (window.innerWidth <= 700) {
-      e.preventDefault();
-      toggle.parentElement.classList.toggle("active");
-    }
-  });
-});
-</script>
 
 <section class="hero">
   <div class="hero-pill">6 Studies · Open Data · India</div>

@@ -113,6 +113,20 @@
     .comp-val { font-size:1.375rem; font-weight:700; color:var(--txt); }
     .comp-sub { font-size:.78rem; color:var(--txt2); margin-top:.2rem; }
     @media (max-width:700px) { nav { flex-wrap:wrap; } .two-col,.comp-grid { grid-template-columns:1fr; } }
+
+    /* ── NAV DROPDOWN ── */
+    .nav-links { display:flex; gap:1.25rem; list-style:none; align-items:center; flex-wrap:wrap; }
+    .nav-links > li > a { color:#94a3b8; text-decoration:none; font-size:.875rem; font-weight:500; transition:color .15s; }
+    .nav-links > li > a.active, .nav-links > li > a:hover { color:#fff; }
+    .nav-dropdown { position:relative; }
+    .nav-dropdown-btn { color:#94a3b8; background:none; border:none; cursor:pointer; font-size:.875rem; font-weight:500; font-family:'Inter',sans-serif; display:flex; align-items:center; gap:.25rem; padding:0; transition:color .15s; white-space:nowrap; }
+    .nav-dropdown-btn.active, .nav-dropdown-btn:hover { color:#fff; }
+    .nav-dropdown-menu { position:absolute; top:calc(100% + .625rem); left:0; background:#1e293b; border:1px solid #334155; border-radius:10px; padding:.5rem; min-width:215px; opacity:0; visibility:hidden; transform:translateY(-6px); transition:opacity .15s,transform .15s,visibility .15s; z-index:200; list-style:none; box-shadow:0 8px 32px rgba(0,0,0,.4); }
+    .nav-dropdown:hover .nav-dropdown-menu, .nav-dropdown:focus-within .nav-dropdown-menu { opacity:1; visibility:visible; transform:translateY(0); }
+    .nav-dropdown-menu li a { display:flex; align-items:center; gap:.625rem; padding:.5rem .75rem; border-radius:6px; color:#94a3b8; text-decoration:none; font-size:.8125rem; font-weight:500; transition:background .1s,color .1s; }
+    .nav-dropdown-menu li a:hover { background:rgba(255,255,255,.07); color:#fff; }
+    .nav-dropdown-menu li a.active { color:#fff; background:rgba(255,255,255,.05); }
+    .menu-num { font-size:.65rem; font-weight:700; color:#475569; min-width:18px; flex-shrink:0; }
   </style>
 </head>
 <body>
@@ -120,13 +134,20 @@
 
 <nav>
   <a href="index.html" class="logo">Data<span>Truth</span></a>
-  <ul class="nav-links">
-    <li><a href="march-rush.html">The March Rush</a></li>
-    <li><a href="mplads.html">MP's ₹5 Crore</a></li>
-    <li><a href="absent-mp.html" class="active">The Absent MP</a></li>
-    <li><a href="state-debt.html">State Debt</a></li>
-    <li><a href="scheme-maze.html">Scheme Maze</a></li>
-    <li><a href="pension-bomb.html">Pension Bomb</a></li>
+    <ul class="nav-links">
+    <li class="nav-dropdown">
+      <button class="nav-dropdown-btn" class="active">Studies</button>
+      <ul class="nav-dropdown-menu">
+        <li><a href="march-rush.html"><span class="menu-num">01</span> The March Rush</a></li>
+        <li><a href="mplads.html"><span class="menu-num">02</span> MP's ₹5 Crore</a></li>
+        <li><a href="absent-mp.html" class="active"><span class="menu-num">03</span> The Absent MP</a></li>
+        <li><a href="state-debt.html"><span class="menu-num">04</span> State Debt</a></li>
+        <li><a href="scheme-maze.html"><span class="menu-num">05</span> Scheme Maze</a></li>
+        <li><a href="pension-bomb.html"><span class="menu-num">06</span> Pension Bomb</a></li>
+      </ul>
+    </li>
+    <li><a href="credits.html">Credits</a></li>
+    <li><a href="https://github.com/siddharth2798/datatruth/blob/main/LICENSE" target="_blank" rel="noopener">License</a></li>
   </ul>
 </nav>
 
